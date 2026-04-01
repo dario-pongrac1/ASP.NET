@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using lab_1.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace lab_1.Controllers
@@ -18,15 +16,10 @@ namespace lab_1.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return Problem("Doslo je do neocekivane greske.");
         }
     }
 }

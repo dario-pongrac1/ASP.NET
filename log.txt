@@ -1,0 +1,1324 @@
+User: Pozdrav, ovo je zadatak koji moram napraviti od ovog projekta. Zanemari hooks trenutno nego hajdemo razraditi sami projekt odnosno labos koji trebam izradit (aplikaciju). Napravi plan s kojim cemo izvršiti sve što se traži u labosu unutar ovog solutiona. Ove defaultne stvari koje su se generirale kao demo se mogu maknuti, no hajmo prvo na plan pa cemo onda krenuti s poslom. Moja tema je sljedeća:  Sustav za naručivanje kod automehaničara (neka se zasad ispisuje sve na konzolu no kasnije ce to biti prava asp .net mvc web aplikacija na sljedecim labosima)
+
+GitHub Copilot: Razumijem: želiš konkretan, izvediv plan za cijeli labos unutar postojećeg solutiona, s temom sustava za naručivanje kod automehaničara, i bez implementacije za sada. Prvo ću brzo istražiti postojeći projekt i predložiti strukturu koja pokriva sve uvjete iz zadatka (model, veze, LINQ, async-await, i što se briše od default demo dijelova).Krećem s kratkim read-only pregledom koda preko Explore agenta kako bih plan vezao uz stvarne datoteke i postojeće entry pointe u solutionu.
+
+Map current ASP.NET project
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/lab-1.csproj)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Home)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Shared)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/ErrorViewModel.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers/HomeController.cs#1-1), lines 1 to 30
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/appsettings.json)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/appsettings.Development.json)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Properties/launchSettings.json#1-1), lines 1 to 20
+
+Read [](file:///c%3A/Users/Jan/AppData/Roaming/Code/User/workspaceStorage/74850f63a87dd62b88054f9d68cc5c8e/GitHub.copilot-chat/chat-session-resources/be104d87-9ade-42d2-83e6-b1a365624b2e/call_9a97aFNqXRf8nGq7v7taXOkP__vscode-1775049724594/content.txt)
+
+Prikupio sam kontekst iz solutiona i imam jasan nacrt koji pokriva sve uvjete labosa. Prije finalizacije plana trebam potvrditi 3 ključne odluke (persistencija, arhitektura slojeva i opseg brisanja default MVC datoteka) da plan bude bez rupa.
+
+Analyzing your answers...
+
+Odlično, potvrđeno je: idemo s in-memory kolekcijama, zadržavamo jasne slojeve, i samo minimalno diramo default MVC kostur. Sad ću spremiti detaljan izvedbeni plan u session memory pa ga odmah prikazati i tebi za potvrdu.
+
+Read memory
+
+Created memory file [](file:///c%3A/Users/Jan/AppData/Roaming/Code/User/workspaceStorage/74850f63a87dd62b88054f9d68cc5c8e/GitHub.copilot-chat/memory-tool/memories/YmUxMDRkODctOWFkZS00MmQyLTgzZTYtYjFhMzY1NjI0YjJl/plan.md)
+
+## Plan: Lab 1 AutoMehaničar (in-memory, priprema za MVC)
+
+Cilj je unutar postojećeg solutiona izgraditi kompletan Lab 1 temelj: objektni model + seed + LINQ + async/await, s ispisom rezultata kroz konzolni runner pri pokretanju aplikacije. Time ispunjavamo sve zahtjeve zadatka sada, a ostavljamo dobru bazu za kasniji pravi ASP.NET MVC UI.
+
+**Potvrđene odluke**
+1. Baza: in-memory kolekcije (bez EF/SQLite u ovom labosu).
+2. Arhitektura: da, uvodimo jasne slojeve unutar istog projekta.
+3. Default MVC: minimalno čišćenje demo dijelova, zadržati kostur.
+
+**Steps**
+1. Faza 1 - Postaviti jasnu strukturu slojeva unutar projekta.
+2. Uvesti mape: Models/Entities, Models/Enums, Data, Services, Runner.
+3. Zadržati postojeći startup pipeline i samo dodati poziv lab runnera u startup tok.
+4. Faza 2 - Definirati objektni model koji pokriva uvjete labosa.
+5. Napraviti barem 8 klasa: Customer, Vehicle, Mechanic, ServiceCategory, ServiceItem, ServiceOrder, OrderLine, AppointmentSlot.
+6. Uvesti barem 1 enum (npr. OrderStatus) i DateTime svojstva u više klasa (CreatedAt, ScheduledAt).
+7. Osigurati 1-N veze: Customer->Vehicles, Customer->ServiceOrders, Mechanic->ServiceOrders, ServiceCategory->ServiceItems.
+8. Osigurati N-N vezu preko spojne klase: ServiceOrder<->ServiceItem kroz OrderLine.
+9. Označiti 4 kompleksne klase s više od 5 svojstava (preporuka: Customer, Vehicle, ServiceOrder, Mechanic).
+10. Faza 3 - Napuniti podatke i razgranati scenarij.
+11. Implementirati in-memory kontekst/repozitorij koji drži sve kolekcije.
+12. Seedati barem 3 glavna objekta (3 narudžbe), svaka s povezanim kupcem, vozilom, mehaničarem i više stavki usluga.
+13. Faza 4 - Implementirati smislene LINQ upite nad modelom.
+14. Pokriti Where, OrderBy, Count, FirstOrDefault/SingleOrDefault, GroupBy + agregacije.
+15. Dodati domenske upite: opterećenje mehaničara, top usluge, narudžbe po periodu, prosječna cijena po kategoriji.
+16. Faza 5 - Ugraditi async/await demonstraciju.
+17. Uvesti async metode u servisima s Task/Task<T>.
+18. Simulirati I/O s Task.Delay da se pokaže korist await obrasca.
+19. Dodati paralelni scenarij s Task.WhenAll za dva ili više izvještaja.
+20. Faza 6 - Ispis i prezentacija rezultata.
+21. Runner mora ispisati: seed sažetak, rezultate svih LINQ upita i async redoslijed izvođenja.
+22. Ispis strukturirati po sekcijama radi lakšeg usmenog objašnjavanja.
+23. Faza 7 - Završna provjera prema rubrici.
+24. Proći checklistu 1:1 i mapirati svaki zahtjev na konkretan dio koda.
+25. Pripremiti kratke bilješke za usmeno (što radi koji LINQ i kako ga mijenjati).
+26. Pripremiti repo strukturu za predaju, uključujući traženi lab-1 log korištenja AI agenta.
+
+**Relevant files**
+1. Program.cs - mjesto gdje ćemo uključiti runner izvršavanje pri startupu.
+2. ErrorViewModel.cs - vjerojatan kandidat za uklanjanje ako ostane neiskorišten.
+3. HomeController.cs - minimalno čišćenje demo logike.
+4. Index.cshtml - minimalno čišćenje demo sadržaja.
+5. lab-1.csproj - provjera konfiguracije projekta i eventualnih dodataka.
+6. _Layout.cshtml - ostaje kao baza za kasnije MVC labove.
+
+**Verification**
+1. Projekt se builda bez grešaka nakon uvođenja modela i servisa.
+2. Pri pokretanju se izvršava runner i prikazuje razgranate podatke za najmanje 3 glavna objekta.
+3. Svaki traženi LINQ tip ima demonstriran i smislen rezultat.
+4. Async dio demonstrira await i barem jedan Task.WhenAll scenarij.
+5. Rubrika je potpuno pokrivena: 7+ klasa, 4 kompleksne, enum, DateTime, 1-N, N-N, seed, LINQ, async.
+
+Ako potvrdiš ovaj plan, u sljedećem koraku krećemo u implementaciju po fazama redom (bez preskakanja rubricnih stavki).
+
+User: Start implementation
+
+GitHub Copilot: Optimizing tool selection...Krećem odmah s implementacijom po dogovorenom planu: prvo ću postaviti domenski model i in-memory data sloj, zatim runner s LINQ i async demonstracijom, pa tek onda minimalno očistiti default demo dijelove.
+
+Created 8 todos
+
+U sljedećem koraku čitam ključne postojeće datoteke da promjene sjednu čisto na trenutni MVC kostur bez nepotrebnog rušenja strukture.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/ErrorViewModel.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Home/Index.cshtml)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers/HomeController.cs)
+
+Sada kreiram jezgru labosa: entitete, enum, in-memory kontekst i seed podatke s realnim vezama 1-N i N-N, tako da odmah ispunimo glavne rubricne uvjete.
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Enums/OrderStatus.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Enums/VehicleFuelType.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Entities/Customer.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Entities/Vehicle.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Entities/Mechanic.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Entities/ServiceCategory.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Entities/ServiceItem.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Entities/ServiceOrder.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Entities/OrderLine.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/Entities/AppointmentSlot.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Data/WorkshopDataContext.cs)
+
+Model i kontekst su dodani; sad unosim seed koji povezuje sve entitete i osigurava 3 glavne narudžbe s grananjem kako treba za LINQ demonstracije.
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Data/WorkshopSeedData.cs)
+
+Napravljen je puni model i seed s povezanim relacijama; sljedeće radim servis koji izvršava tražene LINQ upite i async/await scenarije te onda spajam runner u startup.
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Services/WorkshopQueryService.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Services/WorkshopAsyncService.cs)
+
+Created [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Runner/Lab1HostedRunner.cs)
+
+Sljedeće povezujem sve kroz dependency injection i startup, pa nakon toga čistim samo minimalni demo sadržaj Home stranice.
+
+Generating patch (16 lines) in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+
+```
+
+```
+
+
+Generating patch (26 lines) in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers/HomeController.cs)
+
+
+```
+
+```
+
+
+Generating patch (20 lines) in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Home/Index.cshtml)
+
+
+```
+
+```
+
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Shared/_Layout.cshtml)
+
+Implementacija je spojena u startup i runner već radi na DI razini. Sad rješavam sitne MVC ostatke (Privacy linkove i neiskorištene demo datoteke) pa odmah nakon toga radim build validaciju.
+
+Generating patch (25 lines) in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Shared/_Layout.cshtml)
+
+Searched for files matching `**/Privacy.cshtml`, 1 match
+
+Searched for regex `ErrorViewModel|Privacy` (`**/*.{cs,cshtml}`), 8 results
+
+
+```
+
+```
+
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Shared/_Layout.cshtml)
+
+Ran terminal command: dotnet build
+
+Ran terminal command: dotnet run
+
+Killed terminal
+
+Read changed files in the active git repository
+
+Completed: *Pregledati postojeći startup kod* (1/8)
+
+Checked , no problems found
+
+Implementacija je pokrenuta i završena u ovom solutionu, s fokusom na Lab 1 zahtjeve: objektni model, relacije, seed podaci, LINQ upiti i async/await demonstracija kroz konzolni ispis pri startupu.
+
+**Što je implementirano**
+1. Dodan kompletan domenski model za sustav naručivanja kod automehaničara.
+2. Dodani enumi i DateTime svojstva (više klasa).
+3. Dodan in-memory data kontekst i seed s razgranatim podacima.
+4. Dodan servis s LINQ upitima (Where, OrderBy, Count, FirstOrDefault, SingleOrDefault, GroupBy, podupit preko Any).
+5. Dodan async servis s await i paralelnim Task.WhenAll.
+6. Dodan hosted runner koji sve ispisuje u log/konzolu pri pokretanju.
+7. Minimalno očišćen default MVC demo sadržaj (bez rušenja MVC kostura za iduće labose).
+
+**Glavne datoteke**
+1. Program.cs
+2. WorkshopDataContext.cs
+3. WorkshopSeedData.cs
+4. WorkshopQueryService.cs
+5. WorkshopAsyncService.cs
+6. Lab1HostedRunner.cs
+7. Customer.cs
+8. Vehicle.cs
+9. Mechanic.cs
+10. ServiceCategory.cs
+11. ServiceItem.cs
+12. ServiceOrder.cs
+13. OrderLine.cs
+14. AppointmentSlot.cs
+15. OrderStatus.cs
+16. VehicleFuelType.cs
+17. HomeController.cs
+18. Index.cshtml
+19. _Layout.cshtml
+
+**Verifikacija**
+1. Build prošao bez grešaka.
+2. Runtime provjera prošla: runner ispisuje seed sažetak, LINQ rezultate i async sekciju.
+3. Provjera problema u editoru: nema grešaka.
+
+Ako želiš, sljedeći korak mogu odmah napraviti:
+1. Dodati Lab 1 checklist mapiranje (za svaki rubricni uvjet točna klasa/metoda koja ga pokriva).
+2. Dodati još 2-3 naprednija LINQ upita koje možeš koristiti za usmeno.
+3. Urediti ispis runnera tako da izgleda kao “demo skripta” za prezentaciju pred profesorom.
+
+Made changes.
+
+User: Objasni mi kako bi trebala radit aplikacija, objasni mi gdje i kako se tocno unesu podaci (simulacija narucivanja) i kako se onda završi/obradi taj servis kao rezultat te gdje se to sve prikazuje
+
+GitHub Copilot: Aplikacija sada radi kao simulacija procesa u memoriji, bez forme za unos, i izvršava cijeli scenarij automatski pri pokretanju.
+
+Kako aplikacija trenutno radi, korak po korak
+1. Pokretanje aplikacije:
+Program registrira sve servise i pokreće startup runner.
+Lokacija: Program.cs
+
+2. Učitavanje podataka:
+In-memory kontekst se kreira kao singleton, a u konstruktoru odmah poziva seed metodu koja puni sve liste (kupci, vozila, mehaničari, narudžbe, stavke narudžbe, termini).
+Lokacije:
+WorkshopDataContext.cs
+WorkshopSeedData.cs
+
+3. Izvršavanje simulacije:
+Hosted runner poziva:
+- ispis seed sažetka
+- LINQ upite
+- async/await dio
+Lokacija: Lab1HostedRunner.cs
+
+4. Poslovna logika:
+- LINQ upiti su u WorkshopQueryService.cs
+- async obrada je u WorkshopAsyncService.cs
+
+Gdje i kako se točno unose podaci (simulacija naručivanja)
+Trenutno se podaci unose ručno u seed datoteci:
+WorkshopSeedData.cs
+
+U toj datoteci imaš liste:
+1. categories
+2. services
+3. mechanics
+4. customers
+5. vehicles
+6. orders
+7. orderLines
+8. slots
+
+Ako želiš simulirati novu narudžbu, dodaš:
+1. novi zapis u orders
+2. jednu ili više stavki u orderLines
+3. po potrebi termin u slots
+4. obavezno ispravno povezane ID-eve:
+- CustomerId
+- VehicleId
+- MechanicId
+- ServiceOrderId
+- ServiceItemId
+
+Kako se servis završi/obradi kao rezultat
+Trenutno je status narudžbe simuliran preko OrderStatus enum-a i seed podataka.
+Lokacija enum-a: OrderStatus.cs
+
+To znači:
+1. Narudžba je Scheduled ili InProgress u seedu.
+2. Ako želiš simulirati završetak, promijeni Status na Completed u orders listi u seedu.
+3. Nakon ponovnog pokretanja runner će rezultate prikazati kroz LINQ i async ispis.
+
+Važno: trenutno nema metode koja runtime mijenja status iz InProgress u Completed kroz UI. To je sljedeći korak implementacije.
+
+Gdje se sve prikazuje
+1. Glavni rezultat simulacije:
+Terminal log pri pokretanju aplikacije (dotnet run), iz Lab1HostedRunner-a.
+Datoteka: Lab1HostedRunner.cs
+
+2. Browser prikaz:
+Home stranica samo informativno kaže da se rezultati gledaju u logu.
+Datoteke:
+HomeController.cs
+Index.cshtml
+
+Kako bi trebala raditi u finalnom toku (sljedeća iteracija)
+1. Korisnik kreira narudžbu kroz formu.
+2. Sustav sprema narudžbu i stavke.
+3. Mehaničar preuzima narudžbu (status InProgress).
+4. Nakon odrađenog servisa označi Completed.
+5. Sustav izračuna total, ažurira vozilo i prikaže izvještaj.
+
+Ako želiš, mogu odmah implementirati taj runtime tok bez čekanja:
+1. endpoint za kreiranje narudžbe
+2. endpoint za završetak narudžbe
+3. endpoint za prikaz izvještaja po narudžbi
+4. jednostavnu stranicu ili API output za cijeli lifecycle.
+
+User: Koliko sam razumio ovo su zadaci koje treba napraviti za lab-1. Znaci minimalistički dA ISPUNJAVA OVE UVJETE, netreba cijeli file cycle, već samo ovo iz onog fajla koji sam ti poslao:
+## Zadaci i bodovanje
+
+| Kriterij | Bodovi |
+| --- | --- |
+| Granularno izvođenje agenta po taskovima | 1 |
+| Ispitivanje agenta za pojašnjenja | 1 |
+| Usmeno ispitivanje LINQ/await ili C# koncepata | 2 |
+| Objektni model projektnog zadatka | 2 |
+- [ ]  Dodati javni GitHub repozitorij koji će biti za rad na projektu (sve slati na ‘main’ branch)
+    - [ ]  Javiti na mail GitHub repo link **najkasnije do 20.3.**
+    - [ ]  Sav kod koji se ocjenjuje mora biti na GH repozitoriju
+    - [ ]  U root folder repozitorija dodati folder lab-1 gdje je potrebno uploadati “log” koristenja AI agenta
+- [ ]  Potrebno je kreirati objektni model prema vlastitom projektnom zadatku, koji se sastoji od barem 7 klasa, gdje 4 klase moraju biti kompleksne (preko 5 svojstava). Svojstva trebaju biti smislena i dobrog tipa:
+- barem jedan vlastiti enum
+- barem jedno DateTime svojstvo
+- ispravne konekcije 1-N, N-N
+- [ ]  Potrebno je u main programu “napuniti” objekte podacima - kreirati razgranato barem 3 glavna objekta.
+- primjeice, ako je tema aplikacije “Nogometni turnir”, potrebno je imati barem 3 turnira s po barem 3 ekipe.
+- [ ]  U main programu je potrebno definirati smislene LINQ upite nad objektnim modelom koji će se kasnije (možda) koristiti u samoj aplikaciji
+    - [ ]  Potrebno je razumjeti LINQ naredbe koje su dodane i moći ih modificirati uz pomoć AI agenta
+- [ ]  Proučiti i razumjeti koncept async-await
+- [ ]  Sav kod treba biti na GH **najkasnije do 2.4.2026. u 18:00**
+
+
+To treba zadovoljiti u ovom solutionu zasad. Pa hajde refaktoriraj kod ili nadopuni/makni što već treba da bi ovo smisleno izvršio minimalistički jer ću to morati onda sve naučiti i prezentirati pred profesorom.
+
+GitHub Copilot: Super smjer. Idem to pojednostaviti na stvarno “lab-1 minimal” varijantu: sve ključne demonstracije (seed, LINQ, async/await) će biti jasno vidljive iz glavnog programa, bez dodatnog lifecycle overheada.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Data/WorkshopDataContext.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Data/WorkshopSeedData.cs)
+
+Sad ću maknuti nepotrebnu složenost: pregledam postojeći runner i service datoteke pa ih ili pojednostavim ili uklonim, tako da demonstracija bude što lakša za naučiti i prezentirati.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Runner/Lab1HostedRunner.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Services/WorkshopQueryService.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Services/WorkshopAsyncService.cs)
+
+Sljedeći rez je ključan: prebacujem LINQ i async demonstraciju direktno u glavni program da doslovno zadovolji uvjet “u main programu”, a helper slojeve ću ukloniti da ti ostane što manje za učiti.
+
+Replacing 36 lines with 118 lines in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+
+```
+
+```
+
+
+Replacing 4 lines with 4 lines in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Home/Index.cshtml)
+
+
+```
+
+```
+
+
+Searched for regex `Lab1HostedRunner|WorkshopQueryService|WorkshopAsyncService` (`**/*.cs`), 12 results
+
+Sad čistim višak datoteka koje više nisu dio minimalističnog rješenja, pa odmah radim build i runtime provjeru da ostane samo ono što treba za prezentaciju.
+
+Ran terminal command: Remove-Item -Path .\Runner\Lab1HostedRunner.cs -Force
+
+Ran terminal command: Remove-Item -Path .\Services\WorkshopQueryService.cs -Force
+
+Ran terminal command: Remove-Item -Path .\Services\WorkshopAsyncService.cs -Force
+
+Ran terminal command: dotnet build
+
+Ran terminal command: dotnet run
+
+Killed terminal
+
+Refaktor je gotov i validiran: sad je sve bitno centralizirano u glavnom programu, što je lakše za učenje i usmeno. Za kraj ću ti dati kratku mapu “uvjet -> gdje je pokriveno” da možeš braniti pred profesorom.
+
+Read changed files in the active git repository
+
+Checked , no problems found
+
+Točno tako, i to sam sada refaktorirao na minimalističku varijantu koja direktno gađa Lab 1 uvjete bez dodatnog “full lifecycle” sloja.
+
+**Što je promijenjeno (minimalno i smisleno)**
+1. LINQ i async/await demonstracija su premješteni direktno u glavni program:
+Program.cs
+2. Seed i objektni model ostaju odvojeni i čisti:
+WorkshopDataContext.cs  
+WorkshopSeedData.cs
+3. UI je ostao minimalan, samo informativan:
+Index.cshtml
+4. Build i provjera grešaka prolaze bez errora.
+
+**Kako sad odgovara rubrici (1:1)**
+1. Objektni model 7+ klasa:
+- Imaš 8 klasa u Entities
+2. 4 kompleksne klase (>5 svojstava):
+- Customer, Vehicle, Mechanic, ServiceOrder (i više od toga)
+3. Barem jedan enum:
+- OrderStatus.cs
+- VehicleFuelType.cs
+4. Barem jedno DateTime svojstvo:
+- više njih: RegisteredAt, EmployedSince, CreatedAt, ScheduledAt, LastServiceDate...
+5. Ispravne veze 1-N i N-N:
+- 1-N: Customer->Vehicles, Customer->ServiceOrders, Mechanic->ServiceOrders, ServiceCategory->ServiceItems
+- N-N: ServiceOrder<->ServiceItem preko OrderLine
+6. “Main program” puni objekte:
+- Podaci se seedaju kroz kontekst koji se instancira i koristi iz glavnog programa:
+Program.cs
+7. “Main program” definira smislene LINQ upite:
+- Direktno u Program.cs: Count, FirstOrDefault, SingleOrDefault, Where, OrderBy, GroupBy, Take, Any podupit
+8. Async-await:
+- Direktno u Program.cs kroz Task.Delay + Task.WhenAll
+9. Razgranata barem 3 glavna objekta:
+- 3 narudžbe + povezani kupci/vozila/mehaničari/stavke u seedu:
+WorkshopSeedData.cs
+
+**Napomena za GitHub stavke iz upute**
+To nisu kodski uvjeti pa ih ne mogu automatski završiti iz aplikacijskog koda, ali za predaju moraš ručno:
+1. imati public repo i sve na main
+2. imati folder lab-1 u rootu repoa s logom korištenja AI agenta
+3. poslati link i pushati finalni kod prije roka
+
+Ako želiš, sljedeći korak mogu odmah napraviti kratki “skript za usmeno”:
+1. točno kojim redom pokrenuti demo
+2. što reći za svaki LINQ upit (1-2 rečenice)
+3. što reći za async/await dio da zvuči sigurno na ispitivanju.
+
+Made changes.
+
+User: objasni mi ovaj ispis, koji dio ispisa se odnosi na koji dio izvrsavanja aplikacije:
+------------------------------------------------------------------------------
+You may only use the Microsoft Visual Studio .NET/C/C++ Debugger (vsdbg) with
+Visual Studio Code, Visual Studio or Visual Studio for Mac software to help you
+develop and test your applications.
+------------------------------------------------------------------------------
+
+============================================================
+LAB 1 - Sustav za narucivanje kod automehanicara
+Minimalna demonstracija: model + LINQ + async/await
+============================================================
+SEED PODACI
+Kupci: 3
+Vozila: 3
+Mehanicari: 3
+Narudzbe: 3
+Stavke narudzbi: 7
+------------------------------------------------------------
+LINQ UPITI
+1) Count: Ukupan broj narudzbi = 3
+2) FirstOrDefault: Prva narudzba za mehanicara #2 = SO-2026-003
+3) SingleOrDefault: Trazenje SO-2026-002 = InProgress
+4) Where + OrderBy + ToList: Narudzbe u periodu 2.4.-3.4.2026 = 3
+5) Select + Count: Ivan Horvat ima aktivnih narudzbi: 1
+5) Select + Count: Marko Kovacic ima aktivnih narudzbi: 1
+5) Select + Count: Ana Boric ima aktivnih narudzbi: 1
+6) GroupBy + Take: OBD dijagnostika -> 2
+6) GroupBy + Take: Zamjena ulja -> 2
+6) GroupBy + Take: Servis klima uredaja -> 1
+7) Podupit Any(Any): kupci s dijagnostikom = 2
+------------------------------------------------------------
+ASYNC/AWAIT DEMO
+8) Pokrecem paralelno brojanje statusa (Task.WhenAll)...
+9) Scheduled narudzbe: 2
+10) InProgress narudzbe: 1
+------------------------------------------------------------
+Kraj Lab 1 demonstracije. Web dio ostaje spreman za sljedece labose.
+
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5277
+Microsoft.Hosting.Lifetime: Information: Now listening on: http://localhost:5277
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+Microsoft.Hosting.Lifetime: Information: Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+Microsoft.Hosting.Lifetime: Information: Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\Jan\source\repos\ASP.NET\lab-1
+Microsoft.Hosting.Lifetime: Information: Content root path: C:\Users\Jan\source\repos\ASP.NET\lab-1
+warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
+      Failed to determine the https port for redirect.
+Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware: Warning: Failed to determine the https port for redirect.
+
+
+GitHub Copilot: Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs#1-1), lines 1 to 120
+
+Odličan redoslijed - evo točne mape ispisa na izvršavanje aplikacije:
+
+## Redoslijed izvršavanja i mapa ispisa
+
+**1. LICENCE/DEBUGGER PORUKA**
+```
+You may only use the Microsoft Visual Studio .NET/C/C++ Debugger (vsdbg)...
+```
+Ovo nije dio tvoje aplikacije - to je upozorenja od VS Code-a pri pokretanju.
+
+---
+
+**2. HEADER SEKCIJA (linije 1-3 u Program.cs)**
+```
+============================================================
+LAB 1 - Sustav za narucivanje kod automehanicara
+Minimalna demonstracija: model + LINQ + async/await
+============================================================
+```
+**Gdje se izvršava:**
+```csharp
+var builder = WebApplication.CreateBuilder(args);  // Redak 4
+builder.Services.AddControllersWithViews();         // Redak 7
+builder.Services.AddSingleton<WorkshopDataContext>(); // Redak 8
+
+var app = builder.Build();                          // Redak 10
+var context = app.Services.GetRequiredService<WorkshopDataContext>(); // Redak 12
+await RunLab1DemoAsync(context);                   // Redak 13 - POČINJE DEMO
+```
+
+---
+
+**3. SEED PODACI SEKCIJA** (linije 4-9 u ispisu)
+```
+SEED PODACI
+Kupci: 3
+Vozila: 3
+...
+```
+**Gdje se izvršava:**
+```csharp
+// WorkshopDataContext konstruktor (Data/WorkshopDataContext.cs)
+public WorkshopDataContext()
+{
+    WorkshopSeedData.Initialize(this);  // Ovdje se puni sve sa brojevima
+}
+
+// Nakon toga u RunLab1DemoAsync:
+Console.WriteLine("SEED PODACI");
+Console.WriteLine($"Kupci: {context.Customers.Count}");      // Čita broj iz liste
+Console.WriteLine($"Vozila: {context.Vehicles.Count}");
+```
+
+---
+
+**4. LINQ UPITI SEKCIJA** (linije 10-24 u ispisu)
+```
+LINQ UPITI
+1) Count: Ukupan broj narudzbi = 3
+2) FirstOrDefault: Prva narudzba za mehanicara #2 = SO-2026-003
+...
+```
+**Gdje se izvršava:**
+```csharp
+// U RunLab1DemoAsync (redak 52 dalje):
+
+var orderCount = context.ServiceOrders.Count();    // 1) Count upita
+Console.WriteLine($"1) Count: Ukupan broj narudzbi = {orderCount}");
+
+var firstForMechanic = context.ServiceOrders
+    .Where(o => o.MechanicId == 2)                 // 2) FirstOrDefault upita
+    .OrderBy(o => o.ScheduledAt)
+    .FirstOrDefault();
+Console.WriteLine($"2) FirstOrDefault: ... = {firstForMechanic?.OrderNumber}");
+
+var orderByNumber = context.ServiceOrders
+    .SingleOrDefault(o => o.OrderNumber == "SO-2026-002"); // 3) SingleOrDefault upita
+Console.WriteLine($"3) SingleOrDefault: ... = {orderByNumber?.Status}");
+
+var ordersInPeriod = context.ServiceOrders
+    .Where(o => o.ScheduledAt >= ...). // 4) Where + OrderBy + ToList
+    .OrderBy(o => o.ScheduledAt)
+    .ToList();
+
+var activePerMechanic = context.Mechanics
+    .Select(m => new {...})            // 5) Select + Count
+    .OrderByDescending(x => x.ActiveOrders)
+    .ToList();
+
+var topServices = context.OrderLines
+    .GroupBy(line => line.ServiceItem!.Name) // 6) GroupBy + Take
+    .Select(g => new {...})
+    .OrderByDescending(x => x.UsageCount)
+    .Take(3)
+    .ToList();
+
+var customersWithDiagnostic = context.Customers
+    .Where(c => c.ServiceOrders.Any(order =>  // 7) Podupit Any(Any)
+        order.Lines.Any(line => ...)))
+    .ToList();
+```
+
+---
+
+**5. ASYNC/AWAIT DEMO SEKCIJA** (linije 25-28 u ispisu)
+```
+ASYNC/AWAIT DEMO
+8) Pokrecem paralelno brojanje statusa (Task.WhenAll)...
+9) Scheduled narudzbe: 2
+10) InProgress narudzbe: 1
+```
+**Gdje se izvršava:**
+```csharp
+// redak 108-116 u Program.cs:
+Console.WriteLine("ASYNC/AWAIT DEMO");
+Console.WriteLine("8) Pokrecem paralelno brojanje statusa (Task.WhenAll)...");
+
+var scheduledTask = CountByStatusAsync(context, OrderStatus.Scheduled); // pokrenje prvi async
+var inProgressTask = CountByStatusAsync(context, OrderStatus.InProgress); // pokrenje drugi async
+await Task.WhenAll(scheduledTask, inProgressTask);  // oba se izvršavaju paralelno + čeka oba
+
+Console.WriteLine($"9) Scheduled narudzbe: {scheduledTask.Result}");    // Rezultat prvog
+Console.WriteLine($"10) InProgress narudzbe: {inProgressTask.Result}"); // Rezultat drugog
+```
+
+Funkcija `CountByStatusAsync` (redak 121-126):
+```csharp
+static async Task<int> CountByStatusAsync(WorkshopDataContext context, OrderStatus status)
+{
+    await Task.Delay(120);  // Simulira I/O čekanje od 120ms
+    return context.ServiceOrders.Count(o => o.Status == status);
+}
+```
+
+---
+
+**6. FOOTER + WEB SERVER POKRETANJE** (ostatak ispisa)
+```
+Kraj Lab 1 demonstracije. Web dio ostaje spreman...
+
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5277
+...
+```
+**Gdje se izvršava:**
+```csharp
+// redak 117-119 (završetak demo):
+Console.WriteLine("Kraj Lab 1 demonstracije. Web dio ostaje spreman za sljedece labose.");
+
+// redak 31-32 (nakon što se demo završi):
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();  // OVO POKRENUJE WEB SERVER - nakon ovoga Hosting.Lifetime poruke
+```
+
+---
+
+## SAŽETAK REDOSLIJEDA
+
+```
+1. VS Code debugger poruka (vanjska)
+2. WebApplication builder pokreće se
+3. WorkshopDataContext se kreira + seedaju se podaci
+4. RunLab1DemoAsync se poziva:
+   a) SEED ispis (čita iz lisama koje su upravo seedane)
+   b) LINQ upiti se konstruiraju i izvršavaju
+   c) ASYNC DEMO se pokreće sa Task.WhenAll
+   d) Prints "Kraj demonstracije"
+5. app.Run() pokreće HTTP server
+6. Logging poruke o serveru (Microsoft.Hosting.Lifetime)
+```
+
+Sve je sekvencionalno - nema paralelnog izvršavanja osim što su 2 async taska u `Task.WhenAll` paralelni jedan prema drugom (ali oba čekaju tokom `await`).
+
+User: Objasni mi prema zadacima iz dokumenta lab-1.md koji segment projekta u kojem fajlu/klasi odnosno gdje rješava ono što se tražilo u labosu
+
+GitHub Copilot: Optimizing tool selection...Razradit ću ti mapiranje 1:1 po rubrici iz lab-1.md i vezati svaki uvjet uz konkretne klase/datoteke u projektu, uključujući što je već pokriveno i što je “organizacijski” dio izvan koda.
+
+Searched for files matching `**/Models/Entities/*.cs`, 8 matches
+
+Searched for files matching `**/Models/Enums/*.cs`, 2 matches
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Data/WorkshopSeedData.cs)
+
+Super pitanje. Ispod je mapiranje 1:1 prema stavkama iz lab-1.md, točno gdje je u projektu što pokriveno.
+
+**Mapiranje Na Uvjete Labosa**
+1. Objektni model s barem 7 klasa:
+- Imaš 8 klasa u Entities:
+Customer.cs, Vehicle.cs, Mechanic.cs, ServiceCategory.cs, ServiceItem.cs, ServiceOrder.cs, OrderLine.cs, AppointmentSlot.cs
+
+2. 4 kompleksne klase (više od 5 svojstava):
+- Jasno pokrivaju:
+Customer.cs, Vehicle.cs, Mechanic.cs, ServiceOrder.cs
+
+3. Barem jedan vlastiti enum:
+- Pokriveno u:
+OrderStatus.cs, VehicleFuelType.cs
+
+4. Barem jedno DateTime svojstvo:
+- Više njih je prisutno:
+ServiceOrder.cs, Vehicle.cs, Mechanic.cs, Customer.cs, AppointmentSlot.cs
+
+5. Ispravne veze 1-N i N-N:
+- 1-N:
+Customer -> Vehicles, Customer -> ServiceOrders, Mechanic -> ServiceOrders, ServiceCategory -> ServiceItems
+- N-N:
+ServiceOrder <-> ServiceItem preko spojne klase OrderLine
+- Implementacija i povezivanje referenci su u seedu:
+WorkshopSeedData.cs, WorkshopSeedData.cs, WorkshopSeedData.cs, WorkshopSeedData.cs
+
+6. U main programu napuniti objekte podacima (barem 3 glavna objekta):
+- Main dohvaća kontekst i pokreće demo:
+Program.cs
+- Seed puni 3 narudžbe + povezane kupce/vozila/mehaničare/stavke:
+WorkshopSeedData.cs
+- Sam kontekst poziva seed pri kreiranju:
+WorkshopDataContext.cs
+
+7. Smisleni LINQ upiti u main programu:
+- Svi su direktno u main flow-u:
+Program.cs
+- Konkretno pokriveni:
+Count, FirstOrDefault, SingleOrDefault, Where + OrderBy + ToList, Select + Count, GroupBy + Take, Any podupit
+
+8. Async-await koncept:
+- Demonstracija u main programu:
+Program.cs
+- Paralelno izvršavanje kroz Task.WhenAll:
+Program.cs
+- Async metoda:
+Program.cs
+
+9. Minimalno i smisleno za prezentaciju:
+- Cijeli lab tok je koncentriran u jednoj ulaznoj točki:
+Program.cs
+- Domain i podaci su odvojeni, ali jednostavni:
+WorkshopDataContext.cs, WorkshopSeedData.cs
+
+**Što Nije Kodska Stavka (ali je obavezno za bodove)**
+1. Public GitHub repo, main branch, slanje linka mailom, rokovi:
+- To nije u kodu, to je organizacijski dio predaje.
+2. Folder lab-1 u rootu repozitorija s logom korištenja AI:
+- To je struktura repozitorija i dokumentacija, nije dio runtime logike aplikacije.
+3. Granularno izvođenje agenta i ispitivanje agenta:
+- To se vidi kroz vaš workflow i chat log, ne kroz source kod.
+
+Ako želiš, mogu ti odmah složiti i kratki “obrambeni script” za usmeno: 60-90 sekundi po svakoj rubrici, da točno znaš što reći profesoru za svaki uvjet.
+
+User: Makni sve demo stvari koje su kreirane u ovom projektu a da nisu potrebne za rad ovog što imamo zasad ako ima takvih
+
+GitHub Copilot: Pregledat ću koji su točno default demo elementi još ostali u projektu i zadržati samo ono što je stvarno korisno za ovaj lab, bez rušenja MVC kostura.
+
+Searched for files matching `**/Privacy.cshtml`, 1 match
+
+Searched for files matching `**/Error.cshtml`, 1 match
+
+Searched for files matching `**/ErrorViewModel.cs`, 1 match
+
+Searched for files matching `**/_ValidationScriptsPartial.cshtml`, 1 match
+
+Sad provjeravam stvarne reference prije brisanja da ne uklonim nešto što MVC još koristi indirektno. Nakon toga ću maknuti samo sigurne demo ostatke.
+
+Searched for regex `Privacy|ErrorViewModel|_ValidationScriptsPartial|Error.cshtml` (`**/*.{cs,cshtml}`), 4 results
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers/HomeController.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/_ViewImports.cshtml)
+
+Sad čistim samo sigurni višak: default privacy/error viewove, error model i neiskorišteni validation partial, plus malo pojednostavljenje `HomeController` i `_ViewImports`.
+
+Generating patch (28 lines) in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers/HomeController.cs), [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/_ViewImports.cshtml), [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Home/Privacy.cshtml), [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Shared/Error.cshtml), [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Shared/_ValidationScriptsPartial.cshtml), [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/ErrorViewModel.cs)
+
+
+```
+
+```
+
+```
+
+```
+Čišćenje je završeno; sad samo potvrđujem da projekt i dalje gradi bez ostatka default referenci.
+
+Ran terminal command: dotnet build
+
+Checked , no problems found
+
+Maknuo sam sve sigurni višak koji više nije potreban za ovaj lab:
+
+1. Views/Home/Privacy.cshtml
+2. Views/Shared/Error.cshtml
+3. Views/Shared/_ValidationScriptsPartial.cshtml
+4. Models/ErrorViewModel.cs
+
+Također sam pojednostavio HomeController.cs i očistio _ViewImports.cshtml od nepotrebnog `using`-a.
+
+Projekt i dalje uredno prolazi build nakon čišćenja. Ako želiš, mogu sad napraviti još jedan prolaz i reći ti što je ostalo u projektu kao “core” minimalni set za lab, da točno znaš što trebaš učiti i braniti.
+
+Made changes.
+
+User: e da još da ti kažem, mislim da netrebam imati async/await koncepte u samoj aplikaciji zasad već samo da moram razumjeti to kada me profesor pita tako da to mozes maknuti.
+
+GitHub Copilot: Uklonit ću async/await demonstraciju iz runtime toka i ostaviti samo ono što ti stvarno treba za lab: model, seed i LINQ ispis. Nakon toga ću potvrditi da build i dalje prolazi.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+Mijenjam samo runtime dio: brišem async demonstraciju iz Program.cs, ostavljam LINQ i seed nepromijenjene, i prilagodit ću naslov ispisa da više ne spominje async.
+
+Generating patch (54 lines) in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+
+```
+
+```
+Sad validiram promjenu buildom; ako je nešto ostalo kao referenca na `OrderStatus`, to ću odmah ispraviti.
+
+Ran terminal command: dotnet build
+Completed with input: dotnet build
+
+Build je pao samo zbog uklonjenog `using`-a za `OrderStatus`; vraćam ga i ponovno provjeravam da ostane čisto bez async dijela.
+
+Generating patch (8 lines) in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+
+```
+
+```
+Ponovno gradim projekt nakon male korekcije; očekujem da sad ostane samo minimalni LINQ/startup ispis bez async demonstracije.
+
+Ran terminal command: dotnet build
+Completed with input: dotnet build
+
+Read [](file:///c%3A/Users/Jan/AppData/Roaming/Code/User/workspaceStorage/74850f63a87dd62b88054f9d68cc5c8e/GitHub.copilot-chat/chat-session-resources/be104d87-9ade-42d2-83e6-b1a365624b2e/call_3WCMwS8fb0N1M9YCVWGGDgEI__vscode-1775056734724/content.txt)
+
+Zaustavit ću trenutno pokrenutu `lab-1` aplikaciju koja drži izlazni `.exe` zaključan, pa onda još jednom potvrditi build.
+
+Ran terminal command: Get-Process lab-1 -ErrorAction SilentlyContinue | Stop-Process -Force
+
+Lock je uklonjen; radim završnu build provjeru nakon uklanjanja async dijela da ostane samo ono što ti treba za lab.
+
+Ran terminal command: dotnet build
+
+Maknuo sam async/await demonstraciju iz runtime ispisa. Sada Program.cs radi samo seed + LINQ prikaz, a dio za async više nije u izvršavanju aplikacije.
+
+Zadržano je samo ono što ti treba za lab:
+- model i seed ostaju u WorkshopDataContext.cs i WorkshopSeedData.cs
+- LINQ upiti ostaju u Program.cs
+- aplikacija se i dalje normalno builda
+
+Build je ponovno prošao bez grešaka. Ako želiš, mogu ti sad i dodatno pojednostaviti ispis u Program.cs tako da bude još kraći i lakši za usmeno učenje.
+
+Made changes.
+
+User: moze, pojednostavi jos ispis i onda cemo dalje preći na objašnjavanje koda no to zadas pusti
+
+GitHub Copilot: Skraćujem ispis u Program.cs na kraći, pregledniji format tako da bude lakši za učenje i usmeno objašnjavanje, bez diranja same logike.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+Skratit ću naslove i poruke na jednu jasnu liniju po sekciji, bez mijenjanja upita, da ispis bude pregledniji i brži za čitanje.
+
+Generating patch (68 lines) in [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+
+```
+
+```
+Još samo provjeravam da je pojednostavljeni ispis i dalje ispravan i da ništa nije puklo pri uređivanju.
+
+Ran terminal command: dotnet build
+Completed with input: dotnet build
+
+Read [](file:///c%3A/Users/Jan/AppData/Roaming/Code/User/workspaceStorage/74850f63a87dd62b88054f9d68cc5c8e/GitHub.copilot-chat/chat-session-resources/be104d87-9ade-42d2-83e6-b1a365624b2e/call_M0mmEBcwOcqMAqk2sTBgHpFB__vscode-1775056734730/content.txt)
+
+Build je pao samo zato što je stara `lab-1` instanca još bila pokrenuta i držala `.exe` zaključan; zatvaram je pa odmah ponavljam provjeru.
+
+Ran terminal command: Get-Process lab-1 -ErrorAction SilentlyContinue | Stop-Process -Force
+
+Ponovno gradim projekt nakon gašenja procesa, da potvrda bude čista i bez bočnih grešaka.
+
+Ran terminal command: dotnet build
+
+Ispis je dodatno pojednostavljen. Sada je kraći i pregledniji:
+
+- jedna naslovna sekcija
+- jedan sažetak za seed podatke
+- kraći nazivi LINQ stavki
+- završna poruka bez viška teksta
+
+Logika nije mijenjana, samo način ispisa u Program.cs. Build je ponovno uspješan.
+
+Ako želiš, sljedeće mogu još napraviti:
+1. potpuno preimenovati LINQ ispis u “1. / 2. / 3.” bez dodatnih riječi, da bude još čišći
+2. proći kroz kod i objasniti ga dio po dio, redom kako se izvršava.
+
+Made changes.
+
+User: objasni mi detaljno svaki od ovih linq upita što radi i kako dođe do toga
+
+GitHub Copilot: Naravno. Ova sekcija u Program.cs je cijela tvoja LINQ demonstracija nad podacima koji su već prethodno seedani u WorkshopSeedData.cs. Bitno je razumjeti da se ništa ne čita iz baze, nego nad `List<>` kolekcijama radiš upite kao nad “mini bazom u memoriji”.
+
+**Kako LINQ ovdje radi općenito**
+
+Svaki upit ide ovim redom:
+1. Kreneš od neke kolekcije, npr. `context.ServiceOrders` ili `context.Mechanics`.
+2. Na nju nalijepiš LINQ operatore kao što su `Where`, `OrderBy`, `Select`, `GroupBy`.
+3. Neki operatori samo filtriraju ili transformiraju podatke, a neki odmah vraćaju jedan rezultat ili novu listu.
+4. Na kraju se upit izvrši tek kad dođeš do terminalne operacije kao što su `FirstOrDefault`, `SingleOrDefault`, `ToList` ili `Count`.
+
+---
+
+**1. Count**
+U liniji:
+Program.cs
+
+```csharp
+var orderCount = context.ServiceOrders.Count();
+```
+
+Ovo jednostavno broji koliko elemenata ima u `ServiceOrders`.
+
+Kako dolazi do rezultata:
+1. Uzme se cijela lista narudžbi iz `context.ServiceOrders`.
+2. `Count()` prođe kroz sve elemente i vrati broj.
+3. Ako ima 3 narudžbe u seedu, rezultat je 3.
+
+Zašto je dobar primjer:
+- pokazuje osnovni LINQ agregat
+- najjednostavniji je za objašnjenje na usmenom
+
+---
+
+**2. Where + OrderBy + FirstOrDefault**
+U liniji:
+Program.cs
+
+```csharp
+var firstForMechanic = context.ServiceOrders
+    .Where(o => o.MechanicId == 2)
+    .OrderBy(o => o.ScheduledAt)
+    .FirstOrDefault();
+```
+
+Ovo traži prvu narudžbu za mehaničara s ID-em 2, i to sortira po datumu termina.
+
+Kako ide korak po korak:
+1. `context.ServiceOrders` uzme sve narudžbe.
+2. `Where(o => o.MechanicId == 2)` filtrira samo narudžbe gdje je `MechanicId` jednak 2.
+3. `OrderBy(o => o.ScheduledAt)` sortira te filtrirane narudžbe od najranijeg prema kasnijem terminu.
+4. `FirstOrDefault()` uzima prvi element iz tako sortirane kolekcije.
+5. Ako nema niti jedne takve narudžbe, vraća `null`.
+
+Zašto rezultat ispada `SO-2026-003`:
+- u seedu mehaničar 2 ima jednu narudžbu
+- zato filtriranje ostavi tu jednu
+- `FirstOrDefault()` vrati baš nju
+
+Bitna razlika:
+- `FirstOrDefault` ne traži “jedinstveni” element
+- uzima prvi koji odgovara uvjetu ili `null` ako ga nema
+
+---
+
+**3. SingleOrDefault**
+U liniji:
+Program.cs
+
+```csharp
+var orderByNumber = context.ServiceOrders
+    .SingleOrDefault(o => o.OrderNumber == "SO-2026-002");
+```
+
+Ovo traži točno jednu narudžbu s brojem `SO-2026-002`.
+
+Kako radi:
+1. Krene kroz sve narudžbe.
+2. Gleda koje imaju `OrderNumber == "SO-2026-002"`.
+3. Ako nađe točno jednu, vrati je.
+4. Ako ne nađe nijednu, vrati `null`.
+5. Ako nađe više od jedne, baca iznimku.
+
+Zašto je ovdje dobar primjer:
+- `OrderNumber` bi u stvarnom sustavu trebao biti jedinstven
+- zato je `SingleOrDefault` logičan izbor
+
+Zašto je rezultat `InProgress`:
+- u seedu narudžba `SO-2026-002` ima status `InProgress`
+- zato ispisuje taj status
+
+Bitna razlika u odnosu na `FirstOrDefault`:
+- `FirstOrDefault` ne mari ako ima više podudaranja
+- `SingleOrDefault` očekuje najviše jedan rezultat
+
+---
+
+**4. Where + OrderBy + ToList**
+U liniji:
+Program.cs
+
+```csharp
+var ordersInPeriod = context.ServiceOrders
+    .Where(o => o.ScheduledAt >= new DateTime(2026, 4, 2) && o.ScheduledAt <= new DateTime(2026, 4, 3, 23, 59, 59))
+    .OrderBy(o => o.ScheduledAt)
+    .ToList();
+```
+
+Ovo vraća sve narudžbe koje su zakazane između 2.4.2026. i kraja 3.4.2026., sortirane po datumu.
+
+Kako ide:
+1. `Where(...)` filtrira narudžbe po datumu.
+2. Uvjet provjerava je li `ScheduledAt` unutar raspona.
+3. `OrderBy(o => o.ScheduledAt)` ih sortira od ranijeg prema kasnijem.
+4. `ToList()` pretvara rezultat u konkretnu `List<ServiceOrder>`.
+
+Zašto je tu `ToList()` važan:
+- bez njega dobio biš samo odgođeni LINQ rezultat
+- s `ToList()` se izvršava i materializira u listu
+
+Zašto rezultat ispada 3:
+- u seedu sve 3 narudžbe upadaju u taj vremenski raspon
+- zato `ordersInPeriod.Count` vrati 3
+
+---
+
+**5. Select + Count + OrderByDescending**
+U liniji:
+Program.cs
+
+```csharp
+var activePerMechanic = context.Mechanics
+    .Select(m => new
+    {
+        Mechanic = $"{m.FirstName} {m.LastName}",
+        ActiveOrders = m.ServiceOrders.Count(o => o.Status == OrderStatus.Scheduled || o.Status == OrderStatus.InProgress)
+    })
+    .OrderByDescending(x => x.ActiveOrders)
+    .ToList();
+```
+
+Ovo radi projekciju mehaničara u anonimni objekt koji sadrži ime i broj aktivnih narudžbi.
+
+Kako radi:
+1. `context.Mechanics` uzme sve mehaničare.
+2. `Select(...)` pretvara svaki objekt `Mechanic` u novi oblik.
+3. Novi oblik ima:
+   - puno ime
+   - broj aktivnih narudžbi
+4. `ActiveOrders` se računa tako da se u `m.ServiceOrders` broje samo narudžbe sa statusom `Scheduled` ili `InProgress`.
+5. `OrderByDescending(x => x.ActiveOrders)` sortira mehaničare od najzaposlenijeg prema manje zaposlenom.
+6. `ToList()` materijalizira rezultat.
+
+Zašto je ovo dobar primjer:
+- pokazuje `Select`, dakle projekciju
+- pokazuje i rad s navigacijskim kolekcijama
+- pokazuje agregat unutar projekcije
+
+Zašto svi imaju po 1:
+- u seedu svaki mehaničar ima jednu vezanu narudžbu
+- sve su te narudžbe aktivne jer su `Scheduled` ili `InProgress`
+
+---
+
+**6. GroupBy + Select + Count + OrderByDescending + Take**
+U liniji:
+Program.cs
+
+```csharp
+var topServices = context.OrderLines
+    .GroupBy(line => line.ServiceItem!.Name)
+    .Select(g => new { ServiceName = g.Key, UsageCount = g.Count() })
+    .OrderByDescending(x => x.UsageCount)
+    .ThenBy(x => x.ServiceName)
+    .Take(3)
+    .ToList();
+```
+
+Ovo grupira stavke narudžbi po nazivu usluge i pokazuje koje su usluge najčešće korištene.
+
+Kako radi:
+1. `context.OrderLines` uzme sve stavke narudžbi.
+2. `GroupBy(line => line.ServiceItem!.Name)` grupira ih po nazivu usluge.
+3. Svaka grupa predstavlja jednu uslugu, npr. “OBD dijagnostika”, “Zamjena ulja”.
+4. `Select(g => new { ... })` pretvara grupu u objekt s:
+   - nazivom usluge
+   - brojem pojavljivanja
+5. `Count()` na grupi vraća koliko stavki pripada toj usluzi.
+6. `OrderByDescending(x => x.UsageCount)` sortira najčešće prema rjeđe korištenima.
+7. `ThenBy(x => x.ServiceName)` služi kao sekundarno sortiranje ako je broj jednak.
+8. `Take(3)` uzima samo prva 3 rezultata.
+9. `ToList()` izvršava sve i vraća listu.
+
+Zašto je ovdje `line.ServiceItem!.Name`:
+- `OrderLine` nema vlastito ime usluge, nego preko navigacije dolazi do `ServiceItem`
+- `!` kaže compileru da znaš da nije `null`, jer je u seedu povezan
+
+Zašto su rezultati baš takvi:
+- u seedu neke usluge se ponavljaju više puta kroz različite narudžbe
+- zato `Count()` po grupama pokazuje koliko je puta usluga iskorištena
+
+---
+
+**7. Where + Any + Any**
+U liniji:
+Program.cs
+
+```csharp
+var customersWithDiagnostic = context.Customers
+    .Where(c => c.ServiceOrders.Any(order => order.Lines.Any(line => line.ServiceItem!.ServiceCategoryId == 2)))
+    .ToList();
+```
+
+Ovo traži kupce koji imaju barem jednu narudžbu koja sadrži barem jednu stavku iz kategorije s ID-em 2, tj. dijagnostiku.
+
+Kako radi:
+1. `context.Customers` uzme sve kupce.
+2. `Where(c => ...)` filtrira kupce.
+3. Za svakog kupca se gleda `c.ServiceOrders.Any(...)`.
+4. To znači: ima li kupac barem jednu narudžbu koja zadovoljava uvjet?
+5. Unutar te narudžbe se opet radi `Any` nad stavkama.
+6. Provjerava se postoji li barem jedna stavka čiji je `ServiceCategoryId == 2`.
+7. Ako je odgovor da, kupac ulazi u rezultat.
+
+Zašto je ovo “podupit”:
+- jer unutar jednog LINQ upita radiš drugi uvjet nad povezanom kolekcijom
+- to je klasičan primjer provjere ugniježđenih odnosa
+
+Zašto je rezultat 2:
+- u seedu dva kupca imaju narudžbe koje sadrže dijagnostičke stavke
+
+---
+
+**Kako sve to objasniti profesoru kratko**
+Ako te pita što radi ova sekcija, možeš reći:
+
+- prvo filtriram ili čitam podatke iz in-memory kolekcija
+- zatim pokazujem osnovne LINQ operacije:
+  - Count za brojanje
+  - FirstOrDefault za prvi rezultat ili null
+  - SingleOrDefault za očekivano jedan jedini zapis
+  - Where za filtriranje
+  - OrderBy za sortiranje
+  - Select za projekciju
+  - GroupBy za grupiranje
+  - Any za provjeru postojanja barem jednog podudaranja
+- sve se izvršava nad seedanim objektima iz WorkshopSeedData.cs
+
+Ako želiš, mogu ti odmah u sljedećoj poruci napraviti i:
+1. super kratko usmeno objašnjenje za svaki od ovih upita, po 1-2 rečenice
+2. ili još detaljnije objasniti što točno znači `FirstOrDefault` naspram `SingleOrDefault` s primjerima.
+
+User: smatraš li da su to smisleni upiti koji ce se moci kasnije koristiti u razvoju aplikacije?
+
+GitHub Copilot: Da, ovi upiti su smisleni i realno upotrebljivi kasnije u aplikaciji.
+
+Najkorisniji za budući razvoj:
+1. Brojanje i filtriranje narudžbi po periodu (`Count`, `Where`, `OrderBy`) za dashboard i kalendar termina.
+2. Dohvat pojedinačne narudžbe po broju (`SingleOrDefault`) za detaljni prikaz narudžbe.
+3. Aktivne narudžbe po mehaničaru (`Select` + `Count`) za workload/raspored.
+4. Top usluge (`GroupBy` + `Take`) za reporting i poslovne metrike.
+5. Kupci koji su koristili određenu kategoriju usluge (`Any` podupit) za segmentaciju i marketing.
+
+Što bih kasnije doradio:
+1. Umjesto hardcoded vrijednosti (npr. `MechanicId == 2`, `ServiceCategoryId == 2`) koristiti parametre.
+2. Dodati DTO/projekcije za UI (da ne vraćaš cijele entitete).
+3. Kod prelaska na bazu, iste upite prebaciti u servis/repozitorij sloj i dodati paginaciju.
+
+Zaključak: dobar set za Lab 1, i dobar temelj za stvarni MVC razvoj.
+
+User: okej, daj mi onda još detaljno objasni koncept async-await kako bih to mogao objasniti na upit profesora
+
+GitHub Copilot: Odlično, ovo ti je taman “za usmeno” verzija.
+
+## Što je async/await u C#
+`async/await` je način da napišeš neblokirajući kod koji čeka spor posao (npr. baza, API, file I/O), ali bez blokiranja dretve koja je pozvala metodu.
+
+Ključna ideja:
+1. `async` označi metodu koja može imati `await`.
+2. `await` kaže: “stani ovdje dok se Task ne završi, ali nemoj blokirati dretvu”.
+3. Metoda uglavnom vraća `Task` ili `Task<T>`.
+
+---
+
+## Zašto je to važno
+Bez async:
+1. dretva čeka i “stoji” dok se posao završi
+2. slabija skalabilnost (posebno na web serveru)
+
+S async:
+1. dok čekaš I/O, dretva se može osloboditi za druge zahtjeve
+2. bolja responzivnost i skalabilnost
+
+Jedna rečenica za profesora:
+“Async/await ne ubrzava nužno sam posao, ali povećava propusnost jer dretve nisu blokirane tijekom čekanja.”
+
+---
+
+## Što je Task
+`Task` predstavlja “rad koji traje” i završit će kasnije.
+
+Tipovi:
+1. `Task` -> nema povratne vrijednosti
+2. `Task<T>` -> vraća rezultat tipa `T`
+
+Primjer:
+```csharp
+async Task<int> GetCountAsync()
+{
+    await Task.Delay(100);
+    return 5;
+}
+```
+
+---
+
+## Razlika: sinkrono vs asinkrono čekanje
+
+Sinkrono čekanje:
+```csharp
+Thread.Sleep(1000);
+```
+- blokira dretvu 1 sekundu
+
+Asinkrono čekanje:
+```csharp
+await Task.Delay(1000);
+```
+- ne blokira dretvu; metoda se “pauzira”, a nastavi kad Task završi
+
+---
+
+## Kako teče izvršavanje s await
+Kad dođe do `await someTask`:
+1. ako `someTask` nije gotov, metoda se privremeno prekine
+2. kontrola se vrati pozivatelju
+3. kad Task završi, metoda nastavlja od linije iza `await`
+
+To zovemo continuation (nastavak izvođenja).
+
+---
+
+## Pravila koja trebaš znati za usmeno
+
+1. “Async all the way”
+Ako je metoda async, i metoda koja je zove često treba biti async.
+
+2. Izbjegavaj `.Result` i `.Wait()`
+Mogu uzrokovati blokiranje i deadlock u nekim okruženjima.
+
+3. Potpis metode:
+- koristi `Task` ili `Task<T>`
+- `async void` samo za event handlere
+
+4. CPU-bound vs I/O-bound:
+- I/O-bound: `await` (baza, mreža, disk)
+- CPU-bound: eventualno `Task.Run(...)` ako želiš odvojiti računanje
+
+---
+
+## Paralelizacija s Task.WhenAll
+Ako imaš više neovisnih async poziva, ne moraš ih čekati jedan po jedan.
+
+Sekvencijalno (sporije):
+```csharp
+var a = await AAsync();
+var b = await BAsync();
+```
+
+Paralelno:
+```csharp
+var taskA = AAsync();
+var taskB = BAsync();
+await Task.WhenAll(taskA, taskB);
+var a = taskA.Result;
+var b = taskB.Result;
+```
+
+Za objasniti:
+“`Task.WhenAll` pokreće više async operacija paralelno i čeka da sve završe.”
+
+---
+
+## Kako to povezati s tvojim projektom
+Iako si maknuo async iz runtime demo-a, koncept možeš objasniti na domeni automehaničara:
+
+Primjer scenarija:
+1. dohvat aktivnih narudžbi
+2. dohvat zauzeća mehaničara
+3. dohvat top usluga
+
+To su 3 neovisna upita i mogu ići paralelno s `Task.WhenAll`.
+
+---
+
+## Kratka “usmena” skripta (30-40 sekundi)
+“U C# `async/await` koristim za neblokirajuće čekanje, najčešće kod I/O operacija poput baze i API poziva. Metode vraćaju `Task` ili `Task<T>`. Kad dođem do `await`, metoda se pauzira bez blokiranja dretve i nastavlja kad Task završi. Time server može obraditi više zahtjeva istovremeno. Ako imam više neovisnih operacija, koristim `Task.WhenAll` da ih izvršim paralelno.”
+
+Ako želiš, mogu ti odmah dati i mini set “trik pitanja profesora + idealni odgovori” baš za async/await.

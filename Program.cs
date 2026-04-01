@@ -10,7 +10,7 @@ builder.Services.AddSingleton<WorkshopDataContext>();
 var app = builder.Build();
 
 var context = app.Services.GetRequiredService<WorkshopDataContext>();
-await RunLab1DemoAsync(context);
+RunLab1Demo(context);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -30,24 +30,17 @@ app.MapControllerRoute(
 
 app.Run();
 
-static async Task RunLab1DemoAsync(WorkshopDataContext context)
+static void RunLab1Demo(WorkshopDataContext context)
 {
-    Console.WriteLine("                                                            ");
-    Console.WriteLine("                                                            ");
     Console.WriteLine("============================================================");
     Console.WriteLine("LAB 1 - Sustav za narucivanje kod automehanicara");
-    Console.WriteLine("Minimalna demonstracija: model + LINQ + async/await");
+    Console.WriteLine("Minimalno: model + LINQ");
     Console.WriteLine("============================================================");
 
-    Console.WriteLine("SEED PODACI");
-    Console.WriteLine($"Kupci: {context.Customers.Count}");
-    Console.WriteLine($"Vozila: {context.Vehicles.Count}");
-    Console.WriteLine($"Mehanicari: {context.Mechanics.Count}");
-    Console.WriteLine($"Narudzbe: {context.ServiceOrders.Count}");
-    Console.WriteLine($"Stavke narudzbi: {context.OrderLines.Count}");
+    Console.WriteLine($"Seed: kupci={context.Customers.Count}, vozila={context.Vehicles.Count}, mehanicari={context.Mechanics.Count}, narudzbe={context.ServiceOrders.Count}, stavke={context.OrderLines.Count}");
     Console.WriteLine("------------------------------------------------------------");
 
-    Console.WriteLine("LINQ UPITI");
+    Console.WriteLine("LINQ");
 
     var orderCount = context.ServiceOrders.Count();
     Console.WriteLine($"1) Count: Ukupan broj narudzbi = {orderCount}");
@@ -98,29 +91,5 @@ static async Task RunLab1DemoAsync(WorkshopDataContext context)
         .ToList();
     Console.WriteLine($"7) Podupit Any(Any): kupci s dijagnostikom = {customersWithDiagnostic.Count}");
     Console.WriteLine("------------------------------------------------------------");
-
-    Console.WriteLine("ASYNC/AWAIT DEMO");
-    Console.WriteLine("8) Pokrecem paralelno brojanje statusa (Task.WhenAll)...");
-
-    var scheduledTask = CountByStatusAsync(context, OrderStatus.Scheduled);
-    var inProgressTask = CountByStatusAsync(context, OrderStatus.InProgress);
-    await Task.WhenAll(scheduledTask, inProgressTask);
-
-    Console.WriteLine($"9) Scheduled narudzbe: {scheduledTask.Result}");
-    Console.WriteLine($"10) InProgress narudzbe: {inProgressTask.Result}");
-    Console.WriteLine("------------------------------------------------------------");
-    Console.WriteLine("Kraj Lab 1 demonstracije. Web dio ostaje spreman za sljedece labose.");
-    Console.WriteLine("                                                            ");
-    Console.WriteLine("                                                            ");
-    Console.WriteLine("                                                            ");
-    Console.WriteLine("                                                            ");
-
-
-
-}
-
-static async Task<int> CountByStatusAsync(WorkshopDataContext context, OrderStatus status)
-{
-    await Task.Delay(120);
-    return context.ServiceOrders.Count(o => o.Status == status);
+    Console.WriteLine("Kraj demo ispisa.");
 }

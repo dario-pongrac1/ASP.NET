@@ -1,0 +1,47 @@
+@model IReadOnlyList<ServiceOrder>
+@{
+    ViewData["Title"] = "Radni nalozi";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <span>Radni nalozi</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Radni nalozi</h1>
+        <p class="mb-0">Otvoreni i zavrseni nalozi radionice.</p>
+    </div>
+</section>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>Broj naloga</th>
+                <th>Termin</th>
+                <th>Kupac</th>
+                <th>Vozilo</th>
+                <th>Mehanicar</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model.OrderByDescending(x => x.ScheduledAt))
+            {
+                <tr>
+                    <td>@order.OrderNumber</td>
+                    <td>@order.ScheduledAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td><a asp-controller="Customers" asp-action="Details" asp-route-id="@order.CustomerId">@order.Customer?.FirstName @order.Customer?.LastName</a></td>
+                    <td><a asp-controller="Vehicles" asp-action="Details" asp-route-id="@order.VehicleId">@order.Vehicle?.LicensePlate</a></td>
+                    <td><a asp-controller="Mechanics" asp-action="Details" asp-route-id="@order.MechanicId">@order.Mechanic?.FirstName @order.Mechanic?.LastName</a></td>
+                    <td class="status-@order.Status.ToString().ToLowerInvariant()">@order.Status</td>
+                    <td><a asp-action="Details" asp-route-id="@order.Id">Detalji</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

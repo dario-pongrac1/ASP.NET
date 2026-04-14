@@ -1,13 +1,79 @@
-﻿@{
-    ViewData["Title"] = "Lab 1";
+@model WorkshopDashboardViewModel
+@{
+    ViewData["Title"] = "Početna";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Lab 1 - Automehanicar</h1>
-    <p>
-        Objektni model, LINQ upiti i async/await demonstracija se izvrsavaju u glavnom programu pri startupu.
-    </p>
-    <p>
-        Rezultate pogledaj u log outputu prilikom pokretanja aplikacije.
-    </p>
-</div>
+<nav class="breadcrumbs">
+    <span>Početna</span>
+</nav>
+
+<section class="garage-hero">
+    <div class="garage-hero-content">
+        <h1>PROFESIONALNI SERVIS I ODRŽAVANJE VOZILA</h1>
+        <p>
+            Brzo ugovaranje termina, pouzdana dijagnostika i jasan pregled svakog radnog naloga.
+        </p>
+        <div class="hero-actions">
+            <a class="btn btn-hero-primary" asp-controller="ServiceOrders" asp-action="Index">Zakaži termin</a>
+            <a class="btn btn-hero-secondary" asp-controller="Mechanics" asp-action="Index">Upoznaj mehaničare</a>
+        </div>
+        <section class="logo-strip" tabindex="0">
+            <div class="logo-strip-track">
+                <div class="logo-chip partner-toyota">
+                    <span>TOYOTA</span>
+                </div>
+                <div class="logo-chip partner-mercedes">
+                    <span>Mercedes-benz</span>
+                </div>
+                <div class="logo-chip partner-tokic">
+                    <span>TOKIĆ</span>
+                </div>
+                <div class="logo-chip partner-vrataric">
+                    <span>Vratarić usluge d.o.o.</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+
+<section class="paper-card">
+    <h2 class="h4">Nadolazeći termini</h2>
+    <div class="table-responsive">
+        <table class="table paper-table mb-0">
+            <thead>
+                <tr>
+                    <th>Početak</th>
+                    <th>Kraj</th>
+                    <th>Mehaničar</th>
+                    <th>Status</th>
+                    <th>Nalog</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var slot in Model.UpcomingSlots)
+                {
+                    <tr>
+                        <td>@slot.StartAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@slot.EndAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+                            <a asp-controller="Mechanics" asp-action="Details" asp-route-id="@slot.MechanicId">
+                                @slot.Mechanic?.FirstName @slot.Mechanic?.LastName
+                            </a>
+                        </td>
+                        <td>@(slot.IsReserved ? "Rezerviran" : "Slobodan")</td>
+                        <td>
+                            @if (slot.ServiceOrderId.HasValue)
+                            {
+                                <a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@slot.ServiceOrderId">@slot.ServiceOrderId</a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

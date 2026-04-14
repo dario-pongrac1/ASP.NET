@@ -1,0 +1,45 @@
+@model IReadOnlyList<Mechanic>
+@{
+    ViewData["Title"] = "Mehaničari";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <span>Mehaničari</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Mehaničari</h1>
+        <p class="mb-0">Strucni kadar i raspored rada.</p>
+    </div>
+</section>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>Ime</th>
+                <th>Specijalnost</th>
+                <th>Iskustvo</th>
+                <th>Satnica</th>
+                <th>Certifikat</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var mechanic in Model)
+            {
+                <tr>
+                    <td>@mechanic.FirstName @mechanic.LastName</td>
+                    <td>@mechanic.Specialty</td>
+                    <td>@mechanic.ExperienceYears god.</td>
+                    <td>@mechanic.HourlyRate.ToString("0.00") EUR</td>
+                    <td>@(mechanic.IsCertified ? "Da" : "Ne")</td>
+                    <td><a asp-action="Details" asp-route-id="@mechanic.Id">Detalji</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

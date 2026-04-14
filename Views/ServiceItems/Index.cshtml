@@ -1,0 +1,45 @@
+@model IReadOnlyList<ServiceItem>
+@{
+    ViewData["Title"] = "Usluge";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <span>Usluge</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Usluge</h1>
+        <p class="mb-0">Katalog servisnih zahvata.</p>
+    </div>
+</section>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>Naziv</th>
+                <th>Kategorija</th>
+                <th>Cijena</th>
+                <th>Trajanje</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>
+                        <a asp-controller="ServiceCategories" asp-action="Details" asp-route-id="@item.ServiceCategoryId">@item.Category?.Name</a>
+                    </td>
+                    <td>@item.BasePrice.ToString("0.00") EUR</td>
+                    <td>@item.EstimatedDurationMinutes min</td>
+                    <td><a asp-action="Details" asp-route-id="@item.Id">Detalji</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

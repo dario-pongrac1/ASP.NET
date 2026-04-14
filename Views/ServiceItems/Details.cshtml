@@ -1,0 +1,40 @@
+@model ServiceItem
+@{
+    ViewData["Title"] = "Detalji usluge";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="ServiceItems" asp-action="Index">Usluge</a>
+    <span>/</span>
+    <span>@Model.Name</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>@Model.Name</h1>
+        <p class="mb-0">@Model.Description</p>
+    </div>
+    <a class="btn btn-outline-dark" asp-action="Index">Natrag na listu</a>
+</section>
+
+<section class="paper-card">
+    <p class="mb-1"><strong>Kategorija:</strong> <a asp-controller="ServiceCategories" asp-action="Details" asp-route-id="@Model.ServiceCategoryId">@Model.Category?.Name</a></p>
+    <p class="mb-1"><strong>Osnovna cijena:</strong> @Model.BasePrice.ToString("0.00") EUR</p>
+    <p class="mb-1"><strong>Trajanje:</strong> @Model.EstimatedDurationMinutes min</p>
+    <p class="mb-0"><strong>Potreban materijal:</strong> @(Model.RequiresParts ? "Da" : "Ne")</p>
+</section>
+
+<section class="paper-card">
+    <h2 class="h5">Koristeno u stavkama naloga</h2>
+    <ul class="mb-0">
+        @foreach (var line in Model.OrderLines)
+        {
+            <li>
+                <a asp-controller="OrderLines" asp-action="Details" asp-route-id="@line.Id">Stavka #@line.Id</a>
+                (<a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@line.ServiceOrderId">Nalog @line.ServiceOrder?.OrderNumber</a>)
+            </li>
+        }
+    </ul>
+</section>

@@ -1,0 +1,45 @@
+@model IReadOnlyList<OrderLine>
+@{
+    ViewData["Title"] = "Stavke naloga";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <span>Stavke</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Stavke naloga</h1>
+        <p class="mb-0">Pojedinacni stavke servisnih naloga.</p>
+    </div>
+</section>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nalog</th>
+                <th>Usluga</th>
+                <th>Kolicina</th>
+                <th>Jed. cijena</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Model)
+            {
+                <tr>
+                    <td>@line.Id</td>
+                    <td><a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@line.ServiceOrderId">@line.ServiceOrder?.OrderNumber</a></td>
+                    <td><a asp-controller="ServiceItems" asp-action="Details" asp-route-id="@line.ServiceItemId">@line.ServiceItem?.Name</a></td>
+                    <td>@line.Quantity</td>
+                    <td>@line.UnitPrice.ToString("0.00") EUR</td>
+                    <td><a asp-action="Details" asp-route-id="@line.Id">Detalji</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

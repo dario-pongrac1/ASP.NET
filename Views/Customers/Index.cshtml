@@ -1,0 +1,47 @@
+@model IReadOnlyList<Customer>
+@{
+    ViewData["Title"] = "Kupci";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Pocetna</a>
+    <span>/</span>
+    <span>Kupci</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Kupci</h1>
+        <p class="mb-0">Svi registrirani korisnici radionice.</p>
+    </div>
+</section>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>Ime</th>
+                <th>Telefon</th>
+                <th>Email</th>
+                <th>Vozila</th>
+                <th>Nalozi</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in Model)
+            {
+                <tr>
+                    <td>@customer.FirstName @customer.LastName</td>
+                    <td>@customer.PhoneNumber</td>
+                    <td>@customer.Email</td>
+                    <td>@customer.Vehicles.Count</td>
+                    <td>@customer.ServiceOrders.Count</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@customer.Id">Detalji</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

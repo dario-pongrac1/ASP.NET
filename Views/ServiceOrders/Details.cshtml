@@ -1,0 +1,78 @@
+@model ServiceOrder
+@{
+    ViewData["Title"] = "Detalji radnog naloga";
+    var subtotal = Model.Lines.Sum(line => line.UnitPrice * line.Quantity);
+    var discountedTotal = subtotal * (1 - (Model.DiscountPercent / 100m));
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="ServiceOrders" asp-action="Index">Radni nalozi</a>
+    <span>/</span>
+    <span>@Model.OrderNumber</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>@Model.OrderNumber</h1>
+        <p class="mb-0">Termin: @Model.ScheduledAt.ToString("dd.MM.yyyy HH:mm")</p>
+    </div>
+    <a class="btn btn-outline-dark" asp-action="Index">Natrag na listu</a>
+</section>
+
+<section class="paper-card">
+    <p class="mb-1"><strong>Status:</strong> <span class="status-@Model.Status.ToString().ToLowerInvariant()">@Model.Status</span></p>
+    <p class="mb-1"><strong>Popust:</strong> @Model.DiscountPercent%</p>
+    <p class="mb-0"><strong>Napomena:</strong> @Model.Notes</p>
+</section>
+
+<section class="paper-card">
+    <h2 class="h5">Sudionici naloga</h2>
+    <p class="mb-1">
+        <strong>Kupac:</strong>
+        <a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerId">@Model.Customer?.FirstName @Model.Customer?.LastName</a>
+    </p>
+    <p class="mb-1">
+        <strong>Vozilo:</strong>
+        <a asp-controller="Vehicles" asp-action="Details" asp-route-id="@Model.VehicleId">@Model.Vehicle?.Manufacturer @Model.Vehicle?.Model (@Model.Vehicle?.LicensePlate)</a>
+    </p>
+    <p class="mb-0">
+        <strong>Mehanicar:</strong>
+        <a asp-controller="Mechanics" asp-action="Details" asp-route-id="@Model.MechanicId">@Model.Mechanic?.FirstName @Model.Mechanic?.LastName</a>
+    </p>
+</section>
+
+<section class="paper-card">
+    <h2 class="h5">Stavke naloga</h2>
+    <div class="table-responsive">
+        <table class="table paper-table mb-0">
+            <thead>
+                <tr>
+                    <th>Usluga</th>
+                    <th>Kolicina</th>
+                    <th>Jed. cijena</th>
+                    <th>Trosak dijelova</th>
+                    <th>Ukupno</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in Model.Lines)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="ServiceItems" asp-action="Details" asp-route-id="@line.ServiceItemId">@line.ServiceItem?.Name</a>
+                        </td>
+                        <td>@line.Quantity</td>
+                        <td>@line.UnitPrice.ToString("0.00") EUR</td>
+                        <td>@line.PartCost.ToString("0.00") EUR</td>
+                        <td>@((line.UnitPrice * line.Quantity).ToString("0.00")) EUR</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <hr />
+    <p class="mb-1"><strong>Meduzbroj:</strong> @subtotal.ToString("0.00") EUR</p>
+    <p class="mb-0"><strong>Ukupno nakon popusta:</strong> @discountedTotal.ToString("0.00") EUR</p>
+</section>

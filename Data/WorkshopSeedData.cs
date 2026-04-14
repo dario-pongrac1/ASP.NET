@@ -17,17 +17,17 @@ namespace lab_1.Data
 
             var categories = new List<ServiceCategory>
             {
-                new() { Id = 1, Name = "Regularni servis", Description = "Osnovno odrzavanje vozila.", CreatedAt = new DateTime(2024, 1, 1) },
-                new() { Id = 2, Name = "Dijagnostika", Description = "Dijagnostika i pronalazak gresaka.", CreatedAt = new DateTime(2024, 1, 1) },
-                new() { Id = 3, Name = "Kocioni sustav", Description = "Zamjena i servis kocnica.", CreatedAt = new DateTime(2024, 1, 1) }
+                new() { Id = 1, Name = "Regularni servis", Description = "Osnovno održavanje vozila.", CreatedAt = new DateTime(2024, 1, 1) },
+                new() { Id = 2, Name = "Dijagnostika", Description = "Dijagnostika i pronalazak grešaka.", CreatedAt = new DateTime(2024, 1, 1) },
+                new() { Id = 3, Name = "Kočioni sustav", Description = "Zamjena i servis kočnica.", CreatedAt = new DateTime(2024, 1, 1) }
             };
 
             var services = new List<ServiceItem>
             {
                 new() { Id = 1, Name = "Zamjena ulja", Description = "Motorno ulje + filter ulja.", BasePrice = 60m, EstimatedDurationMinutes = 45, RequiresParts = true, ServiceCategoryId = 1 },
                 new() { Id = 2, Name = "Zamjena filtera zraka", Description = "Novi filter zraka motora.", BasePrice = 25m, EstimatedDurationMinutes = 20, RequiresParts = true, ServiceCategoryId = 1 },
-                new() { Id = 3, Name = "OBD dijagnostika", Description = "Ocitanje i analiza gresaka.", BasePrice = 35m, EstimatedDurationMinutes = 30, RequiresParts = false, ServiceCategoryId = 2 },
-                new() { Id = 4, Name = "Zamjena plocica", Description = "Prednje kocione plocice.", BasePrice = 120m, EstimatedDurationMinutes = 90, RequiresParts = true, ServiceCategoryId = 3 },
+                new() { Id = 3, Name = "OBD dijagnostika", Description = "Očitanje i analiza grešaka.", BasePrice = 35m, EstimatedDurationMinutes = 30, RequiresParts = false, ServiceCategoryId = 2 },
+                new() { Id = 4, Name = "Zamjena pločica", Description = "Prednje kočione pločice.", BasePrice = 120m, EstimatedDurationMinutes = 90, RequiresParts = true, ServiceCategoryId = 3 },
                 new() { Id = 5, Name = "Servis klima uredaja", Description = "Punjenje i dezinfekcija klime.", BasePrice = 80m, EstimatedDurationMinutes = 60, RequiresParts = true, ServiceCategoryId = 1 }
             };
 

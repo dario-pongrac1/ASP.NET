@@ -1,0 +1,51 @@
+@model Mechanic
+@{
+    ViewData["Title"] = "Detalji mehanicara";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="Mechanics" asp-action="Index">Mehaničari</a>
+    <span>/</span>
+    <span>@Model.FirstName @Model.LastName</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>@Model.FirstName @Model.LastName</h1>
+        <p class="mb-0">@Model.Specialty</p>
+    </div>
+    <a class="btn btn-outline-dark" asp-action="Index">Natrag na listu</a>
+</section>
+
+<section class="paper-card">
+    <p class="mb-1"><strong>Certificiran:</strong> @(Model.IsCertified ? "Da" : "Ne")</p>
+    <p class="mb-1"><strong>Iskustvo:</strong> @Model.ExperienceYears godina</p>
+    <p class="mb-1"><strong>Satnica:</strong> @Model.HourlyRate.ToString("0.00") EUR</p>
+    <p class="mb-0"><strong>Zaposlen od:</strong> @Model.EmployedSince.ToString("dd.MM.yyyy")</p>
+</section>
+
+<section class="paper-card">
+    <h2 class="h5">Radni nalozi</h2>
+    <ul class="mb-0">
+        @foreach (var order in Model.ServiceOrders.OrderByDescending(o => o.ScheduledAt))
+        {
+            <li><a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@order.Id">@order.OrderNumber</a></li>
+        }
+    </ul>
+</section>
+
+<section class="paper-card">
+    <h2 class="h5">Termini</h2>
+    <ul class="mb-0">
+        @foreach (var slot in Model.AppointmentSlots.OrderBy(s => s.StartAt))
+        {
+            <li>
+                <a asp-controller="AppointmentSlots" asp-action="Details" asp-route-id="@slot.Id">
+                    @slot.StartAt.ToString("dd.MM HH:mm") - @slot.EndAt.ToString("HH:mm")
+                </a>
+            </li>
+        }
+    </ul>
+</section>

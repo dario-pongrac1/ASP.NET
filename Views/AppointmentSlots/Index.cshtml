@@ -1,0 +1,54 @@
+@model IReadOnlyList<AppointmentSlot>
+@{
+    ViewData["Title"] = "Termini";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <span>Termini</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Termini mehanicara</h1>
+        <p class="mb-0">Pregled zauzetih i slobodnih termina.</p>
+    </div>
+</section>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>Pocetak</th>
+                <th>Kraj</th>
+                <th>Mehanicar</th>
+                <th>Status</th>
+                <th>Nalog</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var slot in Model.OrderBy(x => x.StartAt))
+            {
+                <tr>
+                    <td>@slot.StartAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@slot.EndAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td><a asp-controller="Mechanics" asp-action="Details" asp-route-id="@slot.MechanicId">@slot.Mechanic?.FirstName @slot.Mechanic?.LastName</a></td>
+                    <td>@(slot.IsReserved ? "Rezerviran" : "Slobodan")</td>
+                    <td>
+                        @if (slot.ServiceOrderId.HasValue)
+                        {
+                            <a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@slot.ServiceOrderId">@slot.ServiceOrderId</a>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                    <td><a asp-action="Details" asp-route-id="@slot.Id">Detalji</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

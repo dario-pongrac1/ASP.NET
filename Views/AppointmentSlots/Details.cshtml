@@ -1,0 +1,39 @@
+@model AppointmentSlot
+@{
+    ViewData["Title"] = "Detalji termina";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="AppointmentSlots" asp-action="Index">Termini</a>
+    <span>/</span>
+    <span>#@Model.Id</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Termin #@Model.Id</h1>
+        <p class="mb-0">@Model.StartAt.ToString("dd.MM.yyyy HH:mm") - @Model.EndAt.ToString("HH:mm")</p>
+    </div>
+    <a class="btn btn-outline-dark" asp-action="Index">Natrag na listu</a>
+</section>
+
+<section class="paper-card">
+    <p class="mb-1">
+        <strong>Mehanicar:</strong>
+        <a asp-controller="Mechanics" asp-action="Details" asp-route-id="@Model.MechanicId">@Model.Mechanic?.FirstName @Model.Mechanic?.LastName</a>
+    </p>
+    <p class="mb-1"><strong>Status:</strong> @(Model.IsReserved ? "Rezerviran" : "Slobodan")</p>
+    <p class="mb-0">
+        <strong>Povezani nalog:</strong>
+        @if (Model.ServiceOrderId.HasValue)
+        {
+            <a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@Model.ServiceOrderId">@Model.ServiceOrderId</a>
+        }
+        else
+        {
+            <span>-</span>
+        }
+    </p>
+</section>

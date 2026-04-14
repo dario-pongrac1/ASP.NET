@@ -1,0 +1,36 @@
+@model ServiceCategory
+@{
+    ViewData["Title"] = "Detalji kategorije";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="ServiceCategories" asp-action="Index">Kategorije</a>
+    <span>/</span>
+    <span>@Model.Name</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>@Model.Name</h1>
+        <p class="mb-0">Kreirano: @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+    </div>
+    <a class="btn btn-outline-dark" asp-action="Index">Natrag na listu</a>
+</section>
+
+<section class="paper-card">
+    <p class="mb-0">@Model.Description</p>
+</section>
+
+<section class="paper-card">
+    <h2 class="h5">Usluge u kategoriji</h2>
+    <ul class="mb-0">
+        @foreach (var item in Model.Services)
+        {
+            <li>
+                <a asp-controller="ServiceItems" asp-action="Details" asp-route-id="@item.Id">@item.Name</a>
+            </li>
+        }
+    </ul>
+</section>

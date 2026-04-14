@@ -1,0 +1,48 @@
+@model Vehicle
+@{
+    ViewData["Title"] = "Detalji vozila";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="Vehicles" asp-action="Index">Vozila</a>
+    <span>/</span>
+    <span>@Model.LicensePlate</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>@Model.Manufacturer @Model.Model</h1>
+        <p class="mb-0">@Model.LicensePlate</p>
+    </div>
+    <a class="btn btn-outline-dark" asp-action="Index">Natrag na listu</a>
+</section>
+
+<section class="paper-card">
+    <p class="mb-1"><strong>VIN:</strong> @Model.Vin</p>
+    <p class="mb-1"><strong>Godina:</strong> @Model.Year</p>
+    <p class="mb-1"><strong>Kilometraza:</strong> @Model.MileageKm km</p>
+    <p class="mb-1"><strong>Tip goriva:</strong> @Model.FuelType</p>
+    <p class="mb-0"><strong>Zadnji servis:</strong> @Model.LastServiceDate.ToString("dd.MM.yyyy")</p>
+</section>
+
+<section class="paper-card">
+    <h2 class="h5">Vlasnik</h2>
+    <a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerId">
+        @Model.Owner?.FirstName @Model.Owner?.LastName
+    </a>
+</section>
+
+<section class="paper-card">
+    <h2 class="h5">Povezani radni nalozi</h2>
+    <ul class="mb-0">
+        @foreach (var order in Model.ServiceOrders.OrderByDescending(o => o.ScheduledAt))
+        {
+            <li>
+                <a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@order.Id">@order.OrderNumber</a>
+                - @order.Status
+            </li>
+        }
+    </ul>
+</section>

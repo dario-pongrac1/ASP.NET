@@ -1,0 +1,49 @@
+@model IReadOnlyList<Vehicle>
+@{
+    ViewData["Title"] = "Vozila";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <span>Vozila</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Vozila</h1>
+        <p class="mb-0">Pregled vozila koja se servisiraju u radionici.</p>
+    </div>
+</section>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>Registracija</th>
+                <th>Proizvodac / Model</th>
+                <th>Godina</th>
+                <th>Gorivo</th>
+                <th>Vlasnik</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vehicle in Model)
+            {
+                <tr>
+                    <td>@vehicle.LicensePlate</td>
+                    <td>@vehicle.Manufacturer @vehicle.Model</td>
+                    <td>@vehicle.Year</td>
+                    <td>@vehicle.FuelType</td>
+                    <td>
+                        <a asp-controller="Customers" asp-action="Details" asp-route-id="@vehicle.CustomerId">
+                            @vehicle.Owner?.FirstName @vehicle.Owner?.LastName
+                        </a>
+                    </td>
+                    <td><a asp-action="Details" asp-route-id="@vehicle.Id">Detalji</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,30 @@
+@model OrderLine
+@{
+    ViewData["Title"] = "Detalji stavke";
+    var lineTotal = Model.UnitPrice * Model.Quantity;
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="OrderLines" asp-action="Index">Stavke</a>
+    <span>/</span>
+    <span>#@Model.Id</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Stavka #@Model.Id</h1>
+        <p class="mb-0">Detalj servisne stavke.</p>
+    </div>
+    <a class="btn btn-outline-dark" asp-action="Index">Natrag na listu</a>
+</section>
+
+<section class="paper-card">
+    <p class="mb-1"><strong>Nalog:</strong> <a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@Model.ServiceOrderId">@Model.ServiceOrder?.OrderNumber</a></p>
+    <p class="mb-1"><strong>Usluga:</strong> <a asp-controller="ServiceItems" asp-action="Details" asp-route-id="@Model.ServiceItemId">@Model.ServiceItem?.Name</a></p>
+    <p class="mb-1"><strong>Kolicina:</strong> @Model.Quantity</p>
+    <p class="mb-1"><strong>Jed. cijena:</strong> @Model.UnitPrice.ToString("0.00") EUR</p>
+    <p class="mb-1"><strong>Trosak dijelova:</strong> @Model.PartCost.ToString("0.00") EUR</p>
+    <p class="mb-0"><strong>Ukupno:</strong> @lineTotal.ToString("0.00") EUR</p>
+</section>

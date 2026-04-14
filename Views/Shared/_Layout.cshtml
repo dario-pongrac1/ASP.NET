@@ -1,18 +1,27 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="hr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - lab_1</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lab_1.styles.css" asp-append-version="true" />
 </head>
-<body>
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var bodyClass = currentController == "Home" && currentAction == "Index" ? "home-route" : string.Empty;
+}
+<body class="@bodyClass">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg workorder-nav mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">lab_1</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-tools" aria-hidden="true"></i>
+                    <span>MEHANICARSKA PLOČA</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -20,24 +29,42 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Lab 1</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-house-door" aria-hidden="true"></i> Početna</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Customers" asp-action="Index"><i class="bi bi-people" aria-hidden="true"></i> Kupci</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Vehicles" asp-action="Index"><i class="bi bi-truck" aria-hidden="true"></i> Vozila</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Mechanics" asp-action="Index"><i class="bi bi-wrench-adjustable-circle" aria-hidden="true"></i> Mehaničari</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ServiceOrders" asp-action="Index"><i class="bi bi-clipboard-check" aria-hidden="true"></i> Radni nalozi</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ServiceCategories" asp-action="Index"><i class="bi bi-diagram-3" aria-hidden="true"></i> Kategorije</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ServiceItems" asp-action="Index"><i class="bi bi-nut" aria-hidden="true"></i> Usluge</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="OrderLines" asp-action="Index"><i class="bi bi-list-check" aria-hidden="true"></i> Stavke</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="AppointmentSlots" asp-action="Index"><i class="bi bi-calendar-week" aria-hidden="true"></i> Termini</a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container app-shell">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - lab_1
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

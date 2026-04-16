@@ -1628,3 +1628,371 @@ To nije tehnička stavka koju repozitorij može “zatvoriti”.
 Zaključak: tehnički dio projekta pokriva praktično sve tražene točke; za pun bodovni maksimum još pazi na 2 administrativna dokaza:  
 1. dokaz poziva UX sub-agenta,  
 2. push na default branch GitHub repozitorija.
+
+User: Sta ove dve linije koda rade i zasto bas njih koristim ovdje?
+
+GitHub Copilot: Objasnit ću to konkretno prema stvarnom dizajnu projekta i provjeriti kako se ta dva servisa koriste u ostatku aplikacije, da objašnjenje bude vezano uz vaš kod.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Services/Repositories/WorkshopReadRepository.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Services/Repositories/IWorkshopReadRepository.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers/HomeController.cs)
+
+Te dvije linije registriraju servise u ASP.NET Core dependency injection containeru.
+
+`Program.cs` s `AddSingleton<WorkshopDataContext>()` znači: aplikacija dobije jednu jedinu instancu tog konteksta za cijelo vrijeme rada. To ti ovdje odgovara jer je `WorkshopDataContext` u biti in-memory spremnik s mock podacima, a seedanje radi jednom u konstruktoru preko WorkshopSeedData.cs. Tako svi requestovi vide iste podatke.
+
+`Program.cs` s `AddScoped<IWorkshopReadRepository, WorkshopReadRepository>()` znači: za svaki HTTP request dobiješ novu instancu repozitorija. To je prirodno za MVC, jer controlleri primaju repozitorij po requestu, kao u HomeController.cs, i repozitorij zatim čita iz tog zajedničkog konteksta preko WorkshopReadRepository.cs.
+
+Zašto baš tako:
+- Singleton za `WorkshopDataContext` jer je to mock, in-memory state koji želiš dijeliti kroz cijelu aplikaciju.
+- Scoped za repozitorij jer je vezan uz pojedini request i koristi taj shared context bez nepotrebnog držanja instance cijelo vrijeme.
+- Da je ovo pravi EF Core `DbContext`, tada bi obično i context bio `Scoped`, ne `Singleton`.
+
+U praksi: controller zove repozitorij, repozitorij čita podatke iz jednog zajedničkog in-memory konteksta. To je cijeli smisao ovih registracija.
+
+User: Zasto si koristio interface Iworkshopreadrepository i onda implementacijsku klasu toga a ne samo klasu?
+
+GitHub Copilot: Koristio sam IWorkshopReadRepository.cs i WorkshopReadRepository.cs zato da controlleri ne ovise o konkretnoj klasi, nego o ugovoru. To je standardni DI pristup: HomeController.cs prima interface, a u Program.cs mapiraš koji konkretan tip ga implementira. Tako controller ne zna i ne mora znati odakle dolaze podaci.
+
+U ovom projektu je to posebno korisno jer je repo trenutno samo čitač nad mock in-memory podacima. Interface ti ostavlja mogućnost da kasnije bez promjene controllera zamijeniš implementaciju, primjerice s EF Core repozitorijem, testnom lažnom implementacijom ili nekom drugom varijantom. Bez interfacea bi controller bio vezan direktno uz jednu klasu i svaka zamjena bi tražila izmjenu controllera. U malom projektu je to možda višak, ali u MVC arhitekturi je čista i ispravna praksa.
+
+User: Zašto bi promjena klase trazila i promjenu kontrolera. Ako ima iste metode s implementacijom i isto se poziva u kontroleru, iako se promjeni implementacija u klasi, poziv je isti. Nerazumijem kako je to onda problem?
+
+Jedino da se promjene parametri ili return type poziva al onda opet moras mjenjati interfejs umjesto controlera pa je opet posao kako god okrenes.
+
+GitHub Copilot: U pravu si za jedan dio: ako konkretna klasa zadrži iste metode i isti contract, samo promjena unutarnje implementacije ne traži promjenu kontrolera. To vrijedi i s interfaceom i bez njega. Primjerice, u WorkshopReadRepository možeš promijeniti kako podatke dohvaćaš, a HomeController ostaje isti dok god metoda `GetServiceOrders()` i ostale signature ostanu iste.
+
+Poanta interfacea nije da “spriječi svaku promjenu”, nego da controller ovisi o ugovoru, a ne o konkretnoj klasi. U HomeController vidiš da prima `IWorkshopReadRepository`, a u Program.cs kažeš koja se implementacija koristi. To ti daje slobodu da kasnije:
+- zamijeniš `WorkshopReadRepository` s drugim repozitorijem bez diranja controllera,
+- lakše testiraš controller s fake/mock implementacijom,
+- držiš MVC sloj odvojen od detalja spremanja i dohvaćanja podataka.
+
+Tvoja primjedba za promjenu signature-a je također točna: ako se promijeni povratni tip ili parametri, moraš mijenjati i interface i pozivna mjesta. Ali to nije mana interfacea, nego prirodna posljedica promjene javnog ugovora. Kad se mijenja ugovor, i korisnici tog ugovora se moraju prilagoditi. Interface tu samo čini tu granicu eksplicitnom.
+
+Najkraće rečeno:  
+- bez interfacea: controller je vezan uz konkretnu klasu; zamjena implementacije znači veća sprega  
+- s interfaceom: controller je vezan uz contract; implementacija se može mijenjati bez diranja controllera, dok god contract ostaje isti
+
+Ako želiš, mogu ti to nacrtati na vrlo konkretnom primjeru iz tvog koda, npr. “što bi se promijenilo kad bi sutra umjesto in-memory repozitorija prešao na EF Core”.
+
+User: Sto je ViewModel i zasto se koristi.
+
+GitHub Copilot: Objasnit ću što je ViewModel na tvom konkretnom primjeru i prvo pogledati stvarnu definiciju koja se koristi u HomeController.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Models/ViewModels/WorkshopDashboardViewModel.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Home/Index.cshtml)
+
+ViewModel je klasa koja služi da u view pošalješ točno ono što tom view-u treba, i ništa više.
+
+Na tvom primjeru, WorkshopDashboardViewModel nije domen model poput `Customer` ili `Vehicle`, nego “pripremljen paket podataka” za Index.cshtml. U njemu su samo vrijednosti koje home stranica prikazuje: brojevi kupaca, vozila, naloga, mehaničara i lista nadolazećih termina. Zato ga HomeController sastavlja prije `return View(model);`.
+
+Zašto se koristi:
+- da view ne ovisi direktno o entitetima baze ili repozitoriju
+- da dobije samo podatke koji su mu stvarno potrebni
+- da možeš spojiti više izvora podataka u jedan objekt
+- da ne “prelijevaš” cijeli domain model u UI
+
+U tvom slučaju to je korisno jer home stranica ne prikazuje samo jednu tablicu ili jedan entitet, nego kombinaciju više sažetih informacija i jedne liste termina. Umjesto da view sam zbraja i dohvaća podatke, controller napravi ViewModel i pošalje gotov prikazni model.
+
+Najkraće:  
+- Entity = podatak iz domene / spremnika  
+- ViewModel = podatak pripremljen za prikaz u view-u
+
+Ako želiš, mogu ti odmah pokazati razliku između ViewModela i Entityja na baš jednom konkretnom primjeru iz WorkshopDashboardViewModel.
+
+User: sto ovo znaci i zasto je tu, također objasni mi i IActionResult sto radi konkretno te kakav je to tip objekta i zasto se koristi
+
+GitHub Copilot: `[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]` na HomeController.cs znači da se rezultat te akcije ne smije spremati u cache.
+
+Konkretno:
+- `Duration = 0` znači da odgovor odmah istječe
+- `Location = None` znači da se ne smije cacheirati ni na klijentu ni na proxyjima
+- `NoStore = true` znači da se sadržaj uopće ne smije spremiti
+
+Zašto je tu: na HomeController.cs stranici ne želiš da preglednik ili posredni cache posluži staru grešku. Error stranica treba uvijek biti svježa i pokazivati trenutno stanje, ne neku predmemoriranu verziju.
+
+`IActionResult` je povratni tip za MVC akcije. To je sučelje koje kaže: “ova akcija vraća neki rezultat koji ASP.NET Core zna izvršiti”. Nije jedna konkretna klasa, nego zajednički tip za više mogućih rezultata.
+
+U tvom controlleru to vidiš ovdje:
+- HomeController.cs vraća `View(model)` pa će stvarni rezultat biti tipa `ViewResult`
+- HomeController.cs vraća `Problem(...)`, što je drugi konkretan rezultat koji framework pretvori u HTTP response
+
+Zašto se koristi:
+- jedna akcija može vraćati različite vrste odgovora
+- controller ostaje fleksibilan
+- framework zna kako svaki rezultat pretvoriti u HTTP odgovor
+
+Najjednostavnije:
+- `IActionResult` = ugovor za rezultat akcije
+- `ViewResult`, `RedirectResult`, `JsonResult`, `ContentResult`, `ObjectResult` = konkretne implementacije tog ugovora
+
+Ako želiš, mogu ti odmah objasniti i razliku između `IActionResult`, `ActionResult<T>` i običnog `ViewResult` na istom primjeru iz tvog projekta.
+
+User: moze objasni
+
+GitHub Copilot: Naravno.
+
+`[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]` na HomeController.cs je atribut koji kaže: ovu akciju ne treba cacheirati. To je tu zato što HomeController.cs treba uvijek pokazati trenutno stanje greške, a ne neku staru verziju iz preglednika ili posrednog cachea.
+
+`IActionResult` je tip kojim MVC govori: ova akcija vraća neki odgovor koji framework zna poslati klijentu. To nije jedna konkretna klasa, nego interface preko kojeg možeš vratiti različite stvari. U tvom HomeController.cs to znači da `Index()` vraća view, a `Error()` vraća problem response.
+
+Jednostavno rečeno:
+- `IActionResult` je “što god MVC može pretvoriti u HTTP odgovor”
+- `ViewResult` je odgovor koji vraća stranicu
+- `RedirectResult` vraća preusmjeravanje
+- `JsonResult` vraća JSON
+- `ProblemResult` ili rezultat iz `Problem()` vraća standardiziranu grešku
+
+Zašto se koristi:
+- jedna akcija može vratiti različite vrste odgovora
+- controller ostaje fleksibilan
+- framework na kraju sve pretvori u pravi HTTP response
+
+U tvom primjeru:
+- HomeController.cs vraća view s modelom
+- HomeController.cs vraća error response preko `Problem(...)`
+
+Ako želiš, mogu ti odmah objasniti i razliku između `IActionResult`, `ActionResult` i `ActionResult<T>`.
+
+User: Ajde ti meni sada objasni cijelu strukturu aplikacije, kada ju pokrenes gdje sve krece, kako je organizirano, kako se otvaranjem drugih linkova koje akcije izvrsavaju, kako se podaci pune i to. Ukratko cijeli tok aplikacije
+
+GitHub Copilot: Prvo ću skupiti ključne ulazne točke (startup, routing, kontroleri, layout navigacija i seed podaci) da ti mogu dati jasan end-to-end tok aplikacije od pokretanja do klika na linkove.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Program.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Shared/_Layout.cshtml)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers)
+
+Imam startup i navigaciju; sad čitam kontrolere i repozitorij da mapiram točno koje se akcije izvršavaju na kojem kliku i kako se podaci dohvaćaju.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers/CustomersController.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers/ServiceOrdersController.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Controllers/HomeController.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Services/Repositories/WorkshopReadRepository.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Data/WorkshopDataContext.cs)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Data/WorkshopSeedData.cs)
+
+Još ću kratko provjeriti view sloj (view start/imports i primjer lista→detalji→povezani entiteti) da mogu povezati backend tok s onim što korisnik klikne na ekranu.
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/_ViewImports.cshtml)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Vehicles/Index.cshtml)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/Vehicles/Details.cshtml)
+
+Read [](file:///c%3A/Users/Jan/source/repos/ASP.NET/lab-1/Views/_ViewStart.cshtml)
+
+Super pitanje. Evo cijeli tok aplikacije, od pokretanja do klikanja po linkovima.
+
+**1. Gdje aplikacija kreće**
+1. Start je u Program.cs.
+2. Tu se registriraju servisi:
+- WorkshopDataContext kao singleton
+- IWorkshopReadRepository mapiran na WorkshopReadRepository kao scoped
+3. Pipeline se postavlja i ruta:
+- default ruta je Home/Index u Program.cs
+
+**2. Što se dogodi na prvom requestu**
+1. Otvoriš aplikaciju.
+2. Routing pogodi HomeController.Index u HomeController.cs.
+3. ASP.NET kreira instancu controllera i kroz DI ubaci repozitorij.
+4. Controller kroz repozitorij čita podatke i složi ViewModel WorkshopDashboardViewModel.
+5. Vraća View.
+6. Razor renderira Index.cshtml unutar layouta _Layout.cshtml.
+7. Layout se globalno uključuje preko _ViewStart.cshtml, a tag helperi/usings preko _ViewImports.cshtml.
+
+**3. Kako se podaci pune**
+1. WorkshopDataContext u konstruktoru zove WorkshopSeedData.Initialize.
+2. Seed kreira sve statičke liste: kupce, vozila, mehaničare, kategorije, usluge, naloge, stavke i termine.
+3. Seed odmah povezuje relacije među objektima (npr. Vehicle -> Owner, ServiceOrder -> Customer/Vehicle/Mechanic, itd.).
+4. Zato sve stranice odmah imaju podatke bez baze.
+
+**4. Kako su slojevi organizirani**
+1. Controllers: primaju request i biraju koju akciju pokrenuti, npr. CustomersController.cs, VehiclesController.cs, ServiceOrdersController.cs.
+2. Repository: centralizira čitanje podataka kroz metode GetX i GetXById u WorkshopReadRepository.
+3. Data: in-memory kontekst + seed u Data.
+4. Views: prikaz (Index i Details po entitetima) u Views.
+5. Static assets: stil i JS u wwwroot.
+
+**5. Što se događa kad klikneš linkove**
+1. Gornji meni u _Layout.cshtml vodi na Controller/Index akcije.
+2. Npr. klik na Vozila:
+- ide na VehiclesController.Index
+- učita Index.cshtml
+3. Klik na Detalji vozila:
+- ide na VehiclesController.Details id
+- učita Details.cshtml
+4. U details viewovima imaš povezane linkove na druge entitete.
+- primjer: iz vozila klikneš vlasnika pa ideš na CustomersController.Details
+- primjer: iz vozila klikneš radni nalog pa ideš na ServiceOrdersController.Details
+
+**6. Standardni obrazac kroz cijelu aplikaciju**
+1. Većina kontrolera ima isti pattern:
+- Index: lista
+- Details id: jedan zapis
+- ako nije nađen id, vraća NotFound
+2. To daje jasan tok navigacije: lista -> detalji -> povezani detalji.
+
+**7. Error tok**
+1. U produkciji je uključen exception handler na Home/Error u Program.cs.
+2. Akcija Error u HomeController.cs vraća Problem response.
+3. Na Error akciji je ResponseCache isključen da se greške ne cacheiraju.
+
+**8. Kratki mentalni model cijele app**
+1. Request dođe.
+2. Route odabere controller akciju.
+3. Controller povuče podatke iz repozitorija.
+4. Repozitorij čita iz in-memory konteksta.
+5. Controller vrati view ili problem/notfound.
+6. Razor renderira HTML kroz zajednički layout.
+7. Klik na novi link pokreće isti ciklus.
+
+Ako želiš, mogu ti u sljedećoj poruci dati i jednu ultra-kratku verziju za usmeni ispit u 30 sekundi.
+
+User: Objasni mi DI u ovom projektu i generalno cemu sluzi i zasto se koristi. Objasni mi što je razor. Objasni mi zasto je shared/layout u ovom projektu i cemu sluzi te kako se on renderira slijedno prije ostalih htmla. Objasni mi zasto ima ViewImporst i ViewStart te kada i kako se pozivaju. Cemu sluzi site.css i gdje se koristi u projektu
+
+GitHub Copilot: Odlično pitanje. Ovo su ključni koncepti cijelog MVC toka u tvom projektu.
+
+**DI (Dependency Injection)**
+DI znači da objekt ne kreira sam svoje ovisnosti (`new ...`), nego ih dobije izvana kroz container.
+
+U tvom projektu:
+1. Registracija je u Program.cs:
+- Program.cs: `AddSingleton<WorkshopDataContext>()`
+- Program.cs: `AddScoped<IWorkshopReadRepository, WorkshopReadRepository>()`
+2. Korištenje je u kontrolerima kroz konstruktor, npr. HomeController.cs prima `IWorkshopReadRepository`.
+
+Zašto se koristi:
+1. Manja sprega između slojeva (controller ovisi o ugovoru, ne konkretnoj klasi).
+2. Lakša zamjena implementacije (npr. sutra drugi repository).
+3. Lakše testiranje (mock/fake implementacije).
+4. Centralna kontrola životnog vijeka objekata (`Singleton`, `Scoped`, `Transient`).
+
+U tvom slučaju:
+- `WorkshopDataContext` je singleton jer drži in-memory seed podatke koje dijeli cijela aplikacija.
+- Repository je scoped jer je vezan uz jedan request.
+
+**Što je Razor**
+Razor je view engine za `.cshtml` datoteke: miješa HTML i C# (`@model`, `@foreach`, `@if`) i na runtime/compile-time to prevodi u C# kod koji renderira HTML response.
+
+Primjer: Index.cshtml koristi `@model WorkshopDashboardViewModel` i petlju za termine.
+
+**Zašto postoji Shared/Layout i čemu služi**
+_Layout.cshtml je zajednički “okvir” svih stranica:
+1. `<head>` (CSS/JS linkovi)
+2. top navigacija
+3. zajednički wrapper (`app-shell`)
+4. skripte na dnu
+
+Unutar layouta se poziva `@RenderBody()`, i tu ulazi sadržaj konkretne stranice (npr. Home, Vehicles, Mechanics).
+
+Render slijed (po requestu):
+1. Ruta pogodi akciju kontrolera.
+2. Akcija vrati `View(...)`.
+3. Razor pronađe view.
+4. Primijeni `_ViewStart` (odredi layout).
+5. Renderira view sadržaj.
+6. Ubaci ga u layout na `@RenderBody()`.
+7. Renderira opcionalne sekcije (`@RenderSectionAsync`).
+
+**_ViewImports i _ViewStart**
+1. _ViewImports.cshtml:
+- dodaje common `@using`
+- uključuje Tag Helpere (`@addTagHelper`)
+- vrijedi za sve viewove ispod te mape
+- koristi se pri kompilaciji/renderiranju viewa
+
+2. _ViewStart.cshtml:
+- izvršava se prije svakog view rendera
+- u tvom projektu postavlja `Layout = "_Layout";`
+- zato sve stranice automatski koriste zajednički layout bez ručnog postavljanja u svakom viewu
+
+**Čemu služi site.css i gdje se koristi**
+site.css je glavni globalni stylesheet:
+1. definira theme varijable (`:root`)
+2. stilizira nav, hero, tablice, breadcrumbs, responsive ponašanje
+3. daje cijeli “dark automotive” izgled
+
+Uključuje se u _Layout.cshtml, pa se automatski primjenjuje na sve stranice koje koriste layout.
+
+Ako želiš, mogu ti odmah napisati i kratku “za usmeni” verziju ovog objašnjenja u 20-30 sekundi.
+
+User: cemu ovo sluzi?
+
+GitHub Copilot: Ovaj dio u _Layout.cshtml služi kao “okvir” svake stranice.
+
+Što radi svaka linija:
+
+1. `<div class="container app-shell"> ...`
+- zajednički wrapper za sadržaj
+- daje širinu, padding i vizualni okvir (stilovi su u site.css)
+
+2. `<main role="main" class="pb-3">`
+- semantički glavni sadržaj stranice
+- `role="main"` pomaže accessibility alatima
+- `pb-3` daje donji razmak (Bootstrap utility class)
+
+3. `@RenderBody()`
+- najvažnije: tu se ubacuje sadržaj konkretne view stranice
+- npr. kad otvoriš Home, ovdje se umetne Index.cshtml
+
+4. `<script src="~/lib/jquery/dist/jquery.min.js"></script>`
+- učitava jQuery biblioteku (ako je koristiš u JS-u)
+
+5. `<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>`
+- učitava Bootstrap JS (dropdown, collapse navbar, modal itd.)
+
+6. `<script src="~/js/site.js" asp-append-version="true"></script>`
+- učitava tvoj custom JS
+- `asp-append-version="true"` doda verzijski query string zbog cache bustinga
+
+7. `@await RenderSectionAsync("Scripts", required: false)`
+- omogućuje da pojedinačni view po potrebi doda svoje dodatne skripte
+- `required: false` znači da view ne mora imati tu sekciju
+
+Praktično: layout daje zajednički kostur, `RenderBody()` ubacuje sadržaj stranice, a skripte na dnu učitavaju funkcionalnost.
+
+User: I sad ukratko, kako bi ispunio ovu tocko sto trebam znat, daj mi cheet-sheet:
+- Pripremiti se za usmeno ispitivanje organizacije UI/UX i kako promptatiagente
+
+GitHub Copilot: Super, evo kratki cheat-sheet baš za tu točku.
+
+**1) Što moraš znati za usmeni (UI/UX organizacija)**
+1. Arhitektura: MVC tok je Controller -> Repository -> ViewModel -> Razor View -> Layout.
+2. Zašto ViewModel: view dobije samo podatke za prikaz, bez “curenja” cijelog domain modela.
+3. Zašto Layout: zajednički okvir (nav, stilovi, skripte), a RenderBody ubacuje sadržaj stranice.
+4. Zašto ViewStart i ViewImports: globalno postavljanje layouta i zajedničkih usings/tag helpera.
+5. Navigacija: top menu + breadcrumbs + lista -> detalji + cross-linkovi među entitetima.
+6. UI/UX smjer: non-default Bootstrap, konzistentna dark automotive tema, čitljivost i responzivnost.
+7. Read-only scope: Index/Details bez Create/Edit/Delete (usklađeno sa zadatkom).
+
+**2) Što moraš znati za usmeni (kako promptati agente)**
+1. Daj kontekst: cilj, ograničenja, stil, što ne dirati.
+2. Daj opseg: točno koje datoteke ili sloj mijenjati.
+3. Daj kriterije prihvaćanja: što mora biti “done”.
+4. Traži validaciju: build/test i kratki report što je promijenjeno.
+5. Iteriraj u malim koracima: prvo plan, pa implementacija, pa polish.
+
+**3) Prompt template koji možeš izrecitirati**
+1. Cilj: “Refaktoriraj Home hero u dark automotive stilu.”
+2. Ograničenja: “Ne uvoditi CRUD, ne dirati poslovnu logiku, zadrži hrvatski tekst.”
+3. Scope: “Mijenjaj samo layout, home view i globalni CSS.”
+4. Acceptance: “Partneri na dnu hero sekcije, responzivno, build prolazi bez greške.”
+5. Output: “Napiši koje datoteke su promijenjene i zašto.”
+
+**4) Brzi primjer dobrog prompta**
+“Napravi UI doradu Home stranice u postojećem dark automotive stilu. Zadrži postojeći MVC tok i read-only logiku. Mijenjaj samo layout/home/css. Partneri moraju biti u hero sekciji pri dnu, s hover efektom, hrvatski tekst s dijakriticima. Na kraju pokreni build i napiši što je promijenjeno.”
+
+**5) 30-sekundi odgovor za usmeni**
+“UI/UX sam organizirao kroz zajednički layout, konzistentnu navigaciju i breadcrumbs, te čiste list/detail stranice. Podatke dohvaćam kroz repository, a za prikaz koristim ViewModel gdje treba agregacija. Agente promptam tako da definiram cilj, ograničenja, scope i acceptance kriterije, pa tražim validaciju buildom. Tako dobivam kontrolirane i ponovljive promjene bez rušenja arhitekture.”
+
+Ako želiš, mogu ti odmah napraviti i mini “Q&A skriptu” s 10 najvjerojatnijih pitanja profesora i gotovim kratkim odgovorima.

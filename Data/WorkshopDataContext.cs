@@ -16,7 +16,6 @@ namespace lab_1.Data
 
         public WorkshopDataContext()
         {
-            WorkshopSeedData.Initialize(this);
         }
     }
 }

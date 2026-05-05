@@ -1,0 +1,159 @@
+# Sitemap
+
+## Home
+- URL: `/`
+  - Controller: `HomeController`
+  - Action: `Index`
+  - View: `Views/Home/Index.cshtml`
+- URL: `/Home/Index`
+  - Controller: `HomeController`
+  - Action: `Index`
+  - View: `Views/Home/Index.cshtml`
+- URL: `/Home/Error`
+  - Controller: `HomeController`
+  - Action: `Error`
+  - View: `Problem` response, no dedicated view
+
+## Customers
+- URL: `/kupci`
+  - Controller: `CustomersController`
+  - Action: `Index`
+  - View: `Views/Customers/Index.cshtml`
+- URL: `/kupci/{id}`
+  - Controller: `CustomersController`
+  - Action: `Details`
+  - View: `Views/Customers/Details.cshtml`
+- URL: `/Customers/Index`
+  - Controller: `CustomersController`
+  - Action: `Index`
+  - View: `Views/Customers/Index.cshtml`
+- URL: `/Customers/Details/{id}`
+  - Controller: `CustomersController`
+  - Action: `Details`
+  - View: `Views/Customers/Details.cshtml`
+
+## Vehicles
+- URL: `/vozila`
+  - Controller: `VehiclesController`
+  - Action: `Index`
+  - View: `Views/Vehicles/Index.cshtml`
+- URL: `/vozila/{id}`
+  - Controller: `VehiclesController`
+  - Action: `Details`
+  - View: `Views/Vehicles/Details.cshtml`
+- URL: `/Vehicles/Index`
+  - Controller: `VehiclesController`
+  - Action: `Index`
+  - View: `Views/Vehicles/Index.cshtml`
+- URL: `/Vehicles/Details/{id}`
+  - Controller: `VehiclesController`
+  - Action: `Details`
+  - View: `Views/Vehicles/Details.cshtml`
+
+## Mechanics
+- URL: `/mehanicari`
+  - Controller: `MechanicsController`
+  - Action: `Index`
+  - View: `Views/Mechanics/Index.cshtml`
+- URL: `/mehanicari/{id}`
+  - Controller: `MechanicsController`
+  - Action: `Details`
+  - View: `Views/Mechanics/Details.cshtml`
+- URL: `/Mechanics/Index`
+  - Controller: `MechanicsController`
+  - Action: `Index`
+  - View: `Views/Mechanics/Index.cshtml`
+- URL: `/Mechanics/Details/{id}`
+  - Controller: `MechanicsController`
+  - Action: `Details`
+  - View: `Views/Mechanics/Details.cshtml`
+
+## Service Orders
+- URL: `/radni-nalozi`
+  - Controller: `ServiceOrdersController`
+  - Action: `Index`
+  - View: `Views/ServiceOrders/Index.cshtml`
+- URL: `/radni-nalozi/{id}`
+  - Controller: `ServiceOrdersController`
+  - Action: `Details`
+  - View: `Views/ServiceOrders/Details.cshtml`
+- URL: `/ServiceOrders/Index`
+  - Controller: `ServiceOrdersController`
+  - Action: `Index`
+  - View: `Views/ServiceOrders/Index.cshtml`
+- URL: `/ServiceOrders/Details/{id}`
+  - Controller: `ServiceOrdersController`
+  - Action: `Details`
+  - View: `Views/ServiceOrders/Details.cshtml`
+
+## Service Categories
+- URL: `/kategorije-usluga`
+  - Controller: `ServiceCategoriesController`
+  - Action: `Index`
+  - View: `Views/ServiceCategories/Index.cshtml`
+- URL: `/kategorije-usluga/{id}`
+  - Controller: `ServiceCategoriesController`
+  - Action: `Details`
+  - View: `Views/ServiceCategories/Details.cshtml`
+- URL: `/ServiceCategories/Index`
+  - Controller: `ServiceCategoriesController`
+  - Action: `Index`
+  - View: `Views/ServiceCategories/Index.cshtml`
+- URL: `/ServiceCategories/Details/{id}`
+  - Controller: `ServiceCategoriesController`
+  - Action: `Details`
+  - View: `Views/ServiceCategories/Details.cshtml`
+
+## Service Items
+- URL: `/usluge`
+  - Controller: `ServiceItemsController`
+  - Action: `Index`
+  - View: `Views/ServiceItems/Index.cshtml`
+- URL: `/usluge/{id}`
+  - Controller: `ServiceItemsController`
+  - Action: `Details`
+  - View: `Views/ServiceItems/Details.cshtml`
+- URL: `/ServiceItems/Index`
+  - Controller: `ServiceItemsController`
+  - Action: `Index`
+  - View: `Views/ServiceItems/Index.cshtml`
+- URL: `/ServiceItems/Details/{id}`
+  - Controller: `ServiceItemsController`
+  - Action: `Details`
+  - View: `Views/ServiceItems/Details.cshtml`
+
+## Order Lines
+- URL: `/stavke-naloga`
+  - Controller: `OrderLinesController`
+  - Action: `Index`
+  - View: `Views/OrderLines/Index.cshtml`
+- URL: `/stavke-naloga/{id}`
+  - Controller: `OrderLinesController`
+  - Action: `Details`
+  - View: `Views/OrderLines/Details.cshtml`
+- URL: `/OrderLines/Index`
+  - Controller: `OrderLinesController`
+  - Action: `Index`
+  - View: `Views/OrderLines/Index.cshtml`
+- URL: `/OrderLines/Details/{id}`
+  - Controller: `OrderLinesController`
+  - Action: `Details`
+  - View: `Views/OrderLines/Details.cshtml`
+
+## Appointment Slots
+- URL: `/termini`
+  - Controller: `AppointmentSlotsController`
+  - Action: `Index`
+  - View: `Views/AppointmentSlots/Index.cshtml`
+- URL: `/termini/{id}`
+  - Controller: `AppointmentSlotsController`
+  - Action: `Details`
+  - View: `Views/AppointmentSlots/Details.cshtml`
+- URL: `/AppointmentSlots/Index`
+  - Controller: `AppointmentSlotsController`
+  - Action: `Index`
+  - View: `Views/AppointmentSlots/Index.cshtml`
+- URL: `/AppointmentSlots/Details/{id}`
+  - Controller: `AppointmentSlotsController`
+  - Action: `Details`
+  - View: `Views/AppointmentSlots/Details.cshtml`

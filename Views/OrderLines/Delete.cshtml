@@ -1,0 +1,15 @@
+@model OrderLine
+<section class="page-header">
+    <h1>Obriši stavku naloga</h1>
+</section>
+
+<div class="paper-card border-danger">
+    <p><strong>Usluga: @Model.ServiceItem?.Name</strong></p>
+    <p>Količina: @Model.Quantity</p>
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <button class="btn btn-danger">Obriši</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark">Odustani</a>
+    </form>
+</div>

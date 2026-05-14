@@ -18,6 +18,7 @@ namespace lab_1.Models.Entities
         public int MileageKm { get; set; }
         public VehicleFuelType FuelType { get; set; }
         public DateTime LastServiceDate { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         [ForeignKey(nameof(Owner))]
         public int CustomerId { get; set; }

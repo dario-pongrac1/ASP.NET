@@ -11,6 +11,7 @@ namespace lab_1.Models.Entities
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         public virtual ICollection<ServiceItem> Services { get; set; } = new List<ServiceItem>();
     }

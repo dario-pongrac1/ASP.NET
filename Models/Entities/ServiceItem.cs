@@ -13,6 +13,7 @@ namespace lab_1.Models.Entities
         public decimal BasePrice { get; set; }
         public int EstimatedDurationMinutes { get; set; }
         public bool RequiresParts { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         [ForeignKey(nameof(Category))]
         public int ServiceCategoryId { get; set; }

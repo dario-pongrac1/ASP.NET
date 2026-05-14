@@ -17,5 +17,6 @@ namespace lab_1.Models.Entities
         [ForeignKey(nameof(ServiceOrder))]
         public int? ServiceOrderId { get; set; }
         public virtual ServiceOrder? ServiceOrder { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }

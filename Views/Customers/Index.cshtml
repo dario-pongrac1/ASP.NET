@@ -14,6 +14,7 @@
         <h1>Kupci</h1>
         <p class="mb-0">Svi registrirani korisnici radionice.</p>
     </div>
+    <a asp-action="Create" class="btn btn-dark">+ Novi kupac</a>
 </section>
 
 <div class="table-responsive">
@@ -38,7 +39,9 @@
                     <td>@customer.Vehicles.Count</td>
                     <td>@customer.ServiceOrders.Count</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@customer.Id">Detalji</a>
+                        <a asp-action="Details" asp-route-id="@customer.Id" class="btn-link">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@customer.Id" class="btn-link">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@customer.Id" class="btn-link text-danger">Obriši</a>
                     </td>
                 </tr>
             }

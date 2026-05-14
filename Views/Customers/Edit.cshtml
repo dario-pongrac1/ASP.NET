@@ -1,0 +1,74 @@
+@model Customer
+@{
+    ViewData["Title"] = "Uredi kupca";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="Customers" asp-action="Index">Kupci</a>
+    <span>/</span>
+    <span>Uredi: @Model.FirstName @Model.LastName</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Uredi kupca</h1>
+        <p class="mb-0">@Model.FirstName @Model.LastName</p>
+    </div>
+</section>
+
+<form asp-action="Edit" method="post" class="form-container">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="RegisteredAt" />
+    <input type="hidden" asp-for="DeletedAt" />
+
+    <div class="paper-card">
+        <h2 class="h5 mb-3">Osnovni podaci</h2>
+
+        <div class="form-group mb-3">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger small d-block mt-1"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger small d-block mt-1"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" type="tel" />
+            <span asp-validation-for="PhoneNumber" class="text-danger small d-block mt-1"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" type="email" />
+            <span asp-validation-for="Email" class="text-danger small d-block mt-1"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Address" class="form-label"></label>
+            <input asp-for="Address" class="form-control" />
+            <span asp-validation-for="Address" class="text-danger small d-block mt-1"></span>
+        </div>
+
+        <div class="form-info mt-3">
+            <p class="mb-0"><small class="text-muted">Registriran: @Model.RegisteredAt.ToString("dd.MM.yyyy HH:mm")</small></p>
+        </div>
+    </div>
+
+    <div class="form-actions mt-4">
+        <button type="submit" class="btn btn-dark">Spremi promjene</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark">Odustani</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

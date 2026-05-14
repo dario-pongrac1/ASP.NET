@@ -1,0 +1,21 @@
+@model ServiceCategory
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="paper-card">
+        <div class="mb-3">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+        </div>
+    </div>
+    <div class="mt-3">
+        <button class="btn btn-dark" type="submit">Spremi promjene</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark">Odustani</a>
+    </div>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

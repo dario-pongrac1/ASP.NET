@@ -1,0 +1,57 @@
+@model Customer
+@{
+    ViewData["Title"] = "Obriši kupca";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="Customers" asp-action="Index">Kupci</a>
+    <span>/</span>
+    <span>Obriši: @Model.FirstName @Model.LastName</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Obriši kupca</h1>
+        <p class="mb-0">Ova akcija se ne može poništiti!</p>
+    </div>
+</section>
+
+<div class="paper-card border-danger">
+    <div class="alert alert-danger mb-3">
+        <strong>Upozorenje!</strong> Jeste li sigurni da želite obrisati kupca?
+    </div>
+
+    <h2 class="h5 mb-3">Podatci kupca</h2>
+    
+    <dl class="row">
+        <dt class="col-sm-3">Ime:</dt>
+        <dd class="col-sm-9">@Model.FirstName @Model.LastName</dd>
+
+        <dt class="col-sm-3">Telefon:</dt>
+        <dd class="col-sm-9">@Model.PhoneNumber</dd>
+
+        <dt class="col-sm-3">Email:</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+
+        <dt class="col-sm-3">Adresa:</dt>
+        <dd class="col-sm-9">@Model.Address</dd>
+
+        <dt class="col-sm-3">Vozila:</dt>
+        <dd class="col-sm-9">@Model.Vehicles.Count</dd>
+
+        <dt class="col-sm-3">Nalozi:</dt>
+        <dd class="col-sm-9">@Model.ServiceOrders.Count</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Obriši kupca</button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark">Odustani</a>
+        </div>
+    </form>
+</div>

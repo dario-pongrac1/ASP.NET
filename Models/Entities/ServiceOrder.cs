@@ -16,6 +16,7 @@ namespace lab_1.Models.Entities
         public OrderStatus Status { get; set; }
         public string Notes { get; set; } = string.Empty;
         public decimal DiscountPercent { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         [ForeignKey(nameof(Customer))]
         public int CustomerId { get; set; }

@@ -96,6 +96,31 @@ namespace lab_1.Data
                 .WithMany()
                 .HasForeignKey(appointmentSlot => appointmentSlot.ServiceOrderId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // Query filter za soft delete - automatski filtrira obrisane zapise
+            modelBuilder.Entity<Customer>()
+                .HasQueryFilter(c => c.DeletedAt == null);
+
+            modelBuilder.Entity<Vehicle>()
+                .HasQueryFilter(v => v.DeletedAt == null);
+
+            modelBuilder.Entity<Mechanic>()
+                .HasQueryFilter(m => m.DeletedAt == null);
+
+            modelBuilder.Entity<ServiceCategory>()
+                .HasQueryFilter(sc => sc.DeletedAt == null);
+
+            modelBuilder.Entity<ServiceItem>()
+                .HasQueryFilter(si => si.DeletedAt == null);
+
+            modelBuilder.Entity<ServiceOrder>()
+                .HasQueryFilter(so => so.DeletedAt == null);
+
+            modelBuilder.Entity<OrderLine>()
+                .HasQueryFilter(ol => ol.DeletedAt == null);
+
+            modelBuilder.Entity<AppointmentSlot>()
+                .HasQueryFilter(a => a.DeletedAt == null);
         }
     }
 }

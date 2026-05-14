@@ -19,5 +19,6 @@ namespace lab_1.Models.Entities
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal PartCost { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }

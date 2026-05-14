@@ -1,0 +1,38 @@
+@model AppointmentSlot
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="paper-card">
+        <div class="mb-3">
+            <label asp-for="StartAt"></label>
+            <input asp-for="StartAt" class="form-control" type="datetime-local" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="EndAt"></label>
+            <input asp-for="EndAt" class="form-control" type="datetime-local" />
+        </div>
+        <div class="mb-3">
+            <label>Mehaničar</label>
+            <select asp-for="MechanicId" class="form-control">
+                @foreach (var m in (IEnumerable<Mechanic>)ViewBag.Mechanics) { <option value="@m.Id" selected="@(m.Id==Model.MechanicId)">@m.FirstName @m.LastName</option> }
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Radni nalog (opcionalno)</label>
+            <select asp-for="ServiceOrderId" class="form-control">
+                <option value="">-- bez naloga --</option>
+                @foreach (var o in (IEnumerable<ServiceOrder>)ViewBag.ServiceOrders) { <option value="@o.Id" selected="@(o.Id==Model.ServiceOrderId)">@o.OrderNumber</option> }
+            </select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="IsReserved"></label>
+            <input asp-for="IsReserved" type="checkbox" />
+        </div>
+    </div>
+    <div class="mt-3">
+        <button class="btn btn-dark">Spremi promjene</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark">Odustani</a>
+    </div>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

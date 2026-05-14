@@ -1,0 +1,66 @@
+@model Customer
+@{
+    ViewData["Title"] = "Novi kupac";
+}
+
+<nav class="breadcrumbs">
+    <a asp-controller="Home" asp-action="Index">Početna</a>
+    <span>/</span>
+    <a asp-controller="Customers" asp-action="Index">Kupci</a>
+    <span>/</span>
+    <span>Novi kupac</span>
+</nav>
+
+<section class="page-header">
+    <div>
+        <h1>Novi kupac</h1>
+        <p class="mb-0">Dodaj novog kupca u sustav.</p>
+    </div>
+</section>
+
+<form asp-action="Create" method="post" class="form-container">
+    @Html.AntiForgeryToken()
+
+    <div class="paper-card">
+        <h2 class="h5 mb-3">Osnovni podaci</h2>
+
+        <div class="form-group mb-3">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" placeholder="npr. Marko" />
+            <span asp-validation-for="FirstName" class="text-danger small d-block mt-1"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" placeholder="npr. Horvat" />
+            <span asp-validation-for="LastName" class="text-danger small d-block mt-1"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" type="tel" placeholder="npr. +385 1 234 5678" />
+            <span asp-validation-for="PhoneNumber" class="text-danger small d-block mt-1"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" type="email" placeholder="npr. marko@example.com" />
+            <span asp-validation-for="Email" class="text-danger small d-block mt-1"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Address" class="form-label"></label>
+            <input asp-for="Address" class="form-control" placeholder="npr. Ilica 123, 10000 Zagreb" />
+            <span asp-validation-for="Address" class="text-danger small d-block mt-1"></span>
+        </div>
+    </div>
+
+    <div class="form-actions mt-4">
+        <button type="submit" class="btn btn-dark">Spremi kupca</button>
+        <a asp-action="Index" class="btn btn-outline-dark">Odustani</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

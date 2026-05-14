@@ -15,6 +15,7 @@ namespace lab_1.Models.Entities
         public int ExperienceYears { get; set; }
         public decimal HourlyRate { get; set; }
         public DateTime EmployedSince { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         public virtual ICollection<ServiceOrder> ServiceOrders { get; set; } = new List<ServiceOrder>();
         public virtual ICollection<AppointmentSlot> AppointmentSlots { get; set; } = new List<AppointmentSlot>();

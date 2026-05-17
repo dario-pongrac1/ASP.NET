@@ -33,17 +33,31 @@
         </div>
         <div class="mb-3">
             <label asp-for="LastServiceDate"></label>
-            <input asp-for="LastServiceDate" class="form-control" type="date" />
+            @{
+                ViewBag.InputId = "LastServiceDate";
+                ViewBag.InputName = "LastServiceDate";
+                ViewBag.Mode = "date";
+                ViewBag.Placeholder = "dd.MM.yyyy";
+                ViewBag.InitialValue = Model.LastServiceDate == default
+                    ? string.Empty
+                    : Model.LastServiceDate.ToString("yyyy-MM-dd");
+                ViewBag.NoFuture = true;
+            }
+            @await Html.PartialAsync("_DateTimeControl")
         </div>
         <div class="mb-3">
             <label>Vlasnik</label>
-            <select asp-for="CustomerId" class="form-control">
-                <option value="">-- odaberi kupca --</option>
-                @foreach (var c in (IEnumerable<Customer>)ViewBag.Customers)
-                {
-                    <option value="@c.Id" selected="@(c.Id==Model.CustomerId)">@c.FirstName @c.LastName</option>
-                }
-            </select>
+            @{
+                var customer = Model.CustomerId > 0 ? ((IEnumerable<Customer>)ViewBag.Customers)?.FirstOrDefault(c => c.Id == Model.CustomerId) : null;
+                ViewBag.InputId = "CustomerId";
+                ViewBag.InputName = "CustomerId";
+                ViewBag.DisplayId = "CustomerDisplay";
+                ViewBag.DisplayName = "Odaberi kupca...";
+                ViewBag.SearchEndpoint = "/Customers/Search";
+                ViewBag.InitialValue = customer?.Id ?? 0;
+                ViewBag.InitialLabel = customer != null ? $"{customer.FirstName} {customer.LastName}" : "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
     </div>
     <div class="mt-3">

@@ -116,5 +116,47 @@ namespace lab_1.Controllers
             await _repository.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public IActionResult Search(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return Json(new List<object>());
+            }
+
+            var query = q.ToLower();
+            var vehicles = _repository.GetVehicles()
+                .Where(v => v.LicensePlate.ToLower().Contains(query) || 
+                           v.Manufacturer.ToLower().Contains(query) ||
+                           v.Model.ToLower().Contains(query))
+                .Take(10)
+                .Select(v => new { id = v.Id, label = $"{v.Manufacturer} {v.Model} ({v.LicensePlate})", value = v.Id })
+                .ToList();
+
+            return Json(vehicles);
+        }
+
+        [HttpGet("[controller]/api/search")]
+        public IActionResult ApiSearch(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return PartialView("_SearchResults", new List<Vehicle>());
+            }
+
+            var query = q.ToLower();
+            var vehicles = _repository.GetVehicles()
+                .Where(v => v.LicensePlate.ToLower().Contains(query) ||
+                           v.Manufacturer.ToLower().Contains(query) ||
+                           v.Model.ToLower().Contains(query) ||
+                           (v.Owner != null && (
+                               v.Owner.FirstName.ToLower().Contains(query) ||
+                               v.Owner.LastName.ToLower().Contains(query))))
+                .Take(10)
+                .ToList();
+
+            return PartialView("_SearchResults", vehicles);
+        }
     }
 }

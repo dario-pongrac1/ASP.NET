@@ -6,12 +6,13 @@ using lab_1.Models.Enums;
 
 namespace lab_1.Models.Entities
 {
-    public class ServiceOrder
+    public class ServiceOrder : IValidatableObject
     {
         [Key]
         public int Id { get; set; }
         public string OrderNumber { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        [Display(Name = "Planirani termin")]
         public DateTime ScheduledAt { get; set; }
         public OrderStatus Status { get; set; }
         public string Notes { get; set; } = string.Empty;
@@ -31,5 +32,15 @@ namespace lab_1.Models.Entities
         public virtual Mechanic? Mechanic { get; set; }
 
         public virtual ICollection<OrderLine> Lines { get; set; } = new List<OrderLine>();
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (ScheduledAt < DateTime.Now)
+            {
+                yield return new ValidationResult(
+                    "Planirani termin ne može biti u prošlosti.",
+                    new[] { nameof(ScheduledAt) });
+            }
+        }
     }
 }

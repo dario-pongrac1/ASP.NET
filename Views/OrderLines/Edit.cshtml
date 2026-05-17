@@ -5,15 +5,31 @@
     <div class="paper-card">
         <div class="mb-3">
             <label>Radni nalog</label>
-            <select asp-for="ServiceOrderId" class="form-control">
-                @foreach (var o in (IEnumerable<ServiceOrder>)ViewBag.ServiceOrders) { <option value="@o.Id" selected="@(o.Id==Model.ServiceOrderId)">@o.OrderNumber</option> }
-            </select>
+            @{
+                var serviceOrder = Model.ServiceOrderId > 0 ? ((IEnumerable<ServiceOrder>)ViewBag.ServiceOrders)?.FirstOrDefault(o => o.Id == Model.ServiceOrderId) : null;
+                ViewBag.InputId = "ServiceOrderId";
+                ViewBag.InputName = "ServiceOrderId";
+                ViewBag.DisplayId = "ServiceOrderDisplay";
+                ViewBag.DisplayName = "Odaberi radni nalog...";
+                ViewBag.SearchEndpoint = "/ServiceOrders/Search";
+                ViewBag.InitialValue = serviceOrder?.Id ?? 0;
+                ViewBag.InitialLabel = serviceOrder != null ? $"{serviceOrder.OrderNumber}" : "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
         <div class="mb-3">
             <label>Usluga</label>
-            <select asp-for="ServiceItemId" class="form-control">
-                @foreach (var s in (IEnumerable<ServiceItem>)ViewBag.ServiceItems) { <option value="@s.Id" selected="@(s.Id==Model.ServiceItemId)">@s.Name</option> }
-            </select>
+            @{
+                var serviceItem = Model.ServiceItemId > 0 ? ((IEnumerable<ServiceItem>)ViewBag.ServiceItems)?.FirstOrDefault(s => s.Id == Model.ServiceItemId) : null;
+                ViewBag.InputId = "ServiceItemId";
+                ViewBag.InputName = "ServiceItemId";
+                ViewBag.DisplayId = "ServiceItemDisplay";
+                ViewBag.DisplayName = "Odaberi uslugu...";
+                ViewBag.SearchEndpoint = "/ServiceItems/Search";
+                ViewBag.InitialValue = serviceItem?.Id ?? 0;
+                ViewBag.InitialLabel = serviceItem != null ? $"{serviceItem.Name}" : "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
         <div class="mb-3">
             <label asp-for="Quantity"></label>

@@ -36,17 +36,28 @@
         </div>
         <div class="mb-3">
             <label asp-for="LastServiceDate"></label>
-            <input asp-for="LastServiceDate" class="form-control" type="date" />
+            @{
+                ViewBag.InputId = "LastServiceDate";
+                ViewBag.InputName = "LastServiceDate";
+                ViewBag.Mode = "date";
+                ViewBag.Placeholder = "dd.MM.yyyy";
+                ViewBag.InitialValue = string.Empty;
+                ViewBag.NoFuture = true;
+            }
+            @await Html.PartialAsync("_DateTimeControl")
         </div>
         <div class="mb-3">
             <label>Vlasnik</label>
-            <select asp-for="CustomerId" class="form-control">
-                <option value="">-- odaberi kupca --</option>
-                @foreach (var c in (IEnumerable<Customer>)ViewBag.Customers)
-                {
-                    <option value="@c.Id">@c.FirstName @c.LastName</option>
-                }
-            </select>
+            @{
+                ViewBag.InputId = "CustomerId";
+                ViewBag.InputName = "CustomerId";
+                ViewBag.DisplayId = "CustomerDisplay";
+                ViewBag.DisplayName = "Odaberi kupca...";
+                ViewBag.SearchEndpoint = "/Customers/Search";
+                ViewBag.InitialValue = "";
+                ViewBag.InitialLabel = "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
     </div>
     <div class="mt-3">

@@ -1,0 +1,54 @@
+@using System.Globalization
+
+@{
+    var inputId = ViewBag.InputId?.ToString() ?? "DateValue";
+    var inputName = ViewBag.InputName?.ToString() ?? inputId;
+    var displayId = ViewBag.DisplayId?.ToString() ?? $"{inputId}Display";
+    var mode = ViewBag.Mode?.ToString() ?? "datetime";
+    var placeholder = ViewBag.Placeholder?.ToString() ?? (mode == "date" ? "dd.MM.yyyy" : "dd.MM.yyyy HH:mm");
+    var initialValue = ViewBag.InitialValue?.ToString() ?? string.Empty;
+    var label = ViewBag.Label?.ToString();
+    var modelStateValue = ViewData.ModelState.TryGetValue(inputName, out Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateEntry? entry) && entry != null
+        ? entry.AttemptedValue
+        : null;
+    var displayValue = modelStateValue ?? string.Empty;
+    var validationMessage = ViewData.ModelState.TryGetValue(inputName, out Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateEntry? state) && state != null && state.Errors.Count > 0
+        ? state.Errors[0].ErrorMessage
+        : string.Empty;
+
+    DateTime parsedDate = default;
+    if (string.IsNullOrWhiteSpace(displayValue) && !string.IsNullOrWhiteSpace(initialValue) &&
+        DateTime.TryParse(initialValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out parsedDate))
+    {
+        displayValue = mode == "date"
+            ? parsedDate.ToString("d", CultureInfo.CurrentCulture)
+            : parsedDate.ToString("g", CultureInfo.CurrentCulture);
+    }
+}
+
+<div class="datetime-control" data-datetime-control data-mode="@mode">
+    @if (!string.IsNullOrWhiteSpace(label))
+    {
+        <div class="datetime-control-label">@label</div>
+    }
+    <input type="hidden"
+           id="@inputId"
+           name="@inputName"
+           value="@initialValue"
+           data-role="value" />
+    <input type="text"
+           id="@displayId"
+           class="form-control datetime-display"
+           value="@displayValue"
+           placeholder="@placeholder"
+           autocomplete="off"
+           inputmode="numeric"
+           data-role="display"
+           data-hidden-input="#@inputId"
+           data-locale="@CultureInfo.CurrentCulture.Name"
+           data-no-past="@(ViewBag.NoPast?.ToString()?.ToLowerInvariant() ?? "false")"
+           data-no-future="@(ViewBag.NoFuture?.ToString()?.ToLowerInvariant() ?? "false")"
+           data-compare-target="@(ViewBag.CompareTarget?.ToString() ?? string.Empty)"
+           data-compare-mode="@(ViewBag.CompareMode?.ToString() ?? string.Empty)" />
+    <span class="text-danger small d-block mt-1" data-valmsg-for="@inputName" data-valmsg-replace="true">@validationMessage</span>
+</div>

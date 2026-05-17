@@ -1,0 +1,47 @@
+@model IReadOnlyList<AppointmentSlot>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>Pocetak</th>
+                <th>Kraj</th>
+                <th>Mehanicar</th>
+                <th>Status</th>
+                <th>Nalog</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count == 0)
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Nema rezultata pretrage</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var slot in Model.OrderBy(x => x.StartAt))
+                {
+                    <tr>
+                        <td>@slot.StartAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@slot.EndAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td><a asp-controller="Mechanics" asp-action="Details" asp-route-id="@slot.MechanicId">@slot.Mechanic?.FirstName @slot.Mechanic?.LastName</a></td>
+                        <td>@(slot.IsReserved ? "Rezerviran" : "Slobodan")</td>
+                        <td>
+                            @if (slot.ServiceOrderId.HasValue)
+                            {
+                                <a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@slot.ServiceOrderId">@slot.ServiceOrderId</a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td><a asp-action="Details" asp-route-id="@slot.Id">Detalji</a></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

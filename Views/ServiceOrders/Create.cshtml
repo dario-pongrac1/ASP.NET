@@ -12,7 +12,15 @@
         </div>
         <div class="mb-3">
             <label asp-for="ScheduledAt"></label>
-            <input asp-for="ScheduledAt" type="datetime-local" class="form-control" />
+            @{
+                ViewBag.InputId = "ScheduledAt";
+                ViewBag.InputName = "ScheduledAt";
+                ViewBag.Mode = "datetime";
+                ViewBag.Placeholder = "dd.MM.yyyy HH:mm";
+                ViewBag.InitialValue = string.Empty;
+                ViewBag.NoPast = true;
+            }
+            @await Html.PartialAsync("_DateTimeControl")
         </div>
         <div class="mb-3">
             <label asp-for="DiscountPercent"></label>
@@ -24,24 +32,42 @@
         </div>
         <div class="mb-3">
             <label>Kupac</label>
-            <select asp-for="CustomerId" class="form-control">
-                <option value="">-- odaberi kupca --</option>
-                @foreach (var c in (IEnumerable<Customer>)ViewBag.Customers) { <option value="@c.Id">@c.FirstName @c.LastName</option> }
-            </select>
+            @{
+                ViewBag.InputId = "CustomerId";
+                ViewBag.InputName = "CustomerId";
+                ViewBag.DisplayId = "CustomerDisplay";
+                ViewBag.DisplayName = "Odaberi kupca...";
+                ViewBag.SearchEndpoint = "/Customers/Search";
+                ViewBag.InitialValue = "";
+                ViewBag.InitialLabel = "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
         <div class="mb-3">
             <label>Vozilo</label>
-            <select asp-for="VehicleId" class="form-control">
-                <option value="">-- odaberi vozilo --</option>
-                @foreach (var v in (IEnumerable<Vehicle>)ViewBag.Vehicles) { <option value="@v.Id">@v.Manufacturer @v.Model (@v.LicensePlate)</option> }
-            </select>
+            @{
+                ViewBag.InputId = "VehicleId";
+                ViewBag.InputName = "VehicleId";
+                ViewBag.DisplayId = "VehicleDisplay";
+                ViewBag.DisplayName = "Odaberi vozilo...";
+                ViewBag.SearchEndpoint = "/Vehicles/Search";
+                ViewBag.InitialValue = "";
+                ViewBag.InitialLabel = "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
         <div class="mb-3">
             <label>Mehaničar</label>
-            <select asp-for="MechanicId" class="form-control">
-                <option value="">-- odaberi mehaničara --</option>
-                @foreach (var m in (IEnumerable<Mechanic>)ViewBag.Mechanics) { <option value="@m.Id">@m.FirstName @m.LastName</option> }
-            </select>
+            @{
+                ViewBag.InputId = "MechanicId";
+                ViewBag.InputName = "MechanicId";
+                ViewBag.DisplayId = "MechanicDisplay";
+                ViewBag.DisplayName = "Odaberi mehaničara...";
+                ViewBag.SearchEndpoint = "/Mechanics/Search";
+                ViewBag.InitialValue = "";
+                ViewBag.InitialLabel = "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
     </div>
     <div class="mt-3">

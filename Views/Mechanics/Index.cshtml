@@ -16,7 +16,19 @@
     </div>
 </section>
 
-<div class="table-responsive">
+<div class="search-container mb-3">
+    <div class="input-group">
+        <input type="text"
+               id="searchInput"
+               class="form-control"
+               placeholder="Pretraži mehaničare (ime, specijalnost)..."
+               data-endpoint="/Mechanics/api/search" />
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+    </div>
+    <div id="searchResults" style="display: none;"></div>
+</div>
+
+<div id="tableContainer" class="table-responsive">
     <table class="table paper-table">
         <thead>
             <tr>

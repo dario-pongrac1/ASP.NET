@@ -112,5 +112,42 @@ namespace lab_1.Controllers
             await _repository.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public IActionResult Search(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return Json(new List<object>());
+            }
+
+            var query = q.ToLower();
+            var categories = _repository.GetServiceCategories()
+                .Where(c => c.Name.ToLower().Contains(query) || 
+                           c.Description.ToLower().Contains(query))
+                .Take(10)
+                .Select(c => new { id = c.Id, label = c.Name, value = c.Id })
+                .ToList();
+
+            return Json(categories);
+        }
+
+        [HttpGet("[controller]/api/search")]
+        public IActionResult ApiSearch(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return PartialView("_SearchResults", new List<ServiceCategory>());
+            }
+
+            var query = q.ToLower();
+            var categories = _repository.GetServiceCategories()
+                .Where(c => c.Name.ToLower().Contains(query) ||
+                           c.Description.ToLower().Contains(query))
+                .Take(10)
+                .ToList();
+
+            return PartialView("_SearchResults", categories);
+        }
     }
 }

@@ -1,0 +1,38 @@
+@model IReadOnlyList<ServiceItem>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>Naziv</th>
+                <th>Kategorija</th>
+                <th>Cijena</th>
+                <th>Trajanje</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count == 0)
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted">Nema rezultata pretrage</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>
+                            <a asp-controller="ServiceCategories" asp-action="Details" asp-route-id="@item.ServiceCategoryId">@item.Category?.Name</a>
+                        </td>
+                        <td>@item.BasePrice.ToString("0.00") EUR</td>
+                        <td>@item.EstimatedDurationMinutes min</td>
+                        <td><a asp-action="Details" asp-route-id="@item.Id">Detalji</a></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

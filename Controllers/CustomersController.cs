@@ -119,5 +119,46 @@ namespace lab_1.Controllers
             await _repository.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        // SEARCH - AJAX autocomplete
+        [HttpGet]
+        public IActionResult Search(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return Json(new List<object>());
+            }
+
+            var query = q.ToLower();
+            var customers = _repository.GetCustomers()
+                .Where(c => c.FirstName.ToLower().Contains(query) || 
+                           c.LastName.ToLower().Contains(query) ||
+                           c.Email.ToLower().Contains(query))
+                .Take(10)
+                .Select(c => new { id = c.Id, label = $"{c.FirstName} {c.LastName} ({c.Email})", value = c.Id })
+                .ToList();
+
+            return Json(customers);
+        }
+
+            // API SEARCH - Index table search
+            [HttpGet("[controller]/api/search")]
+            public IActionResult ApiSearch(string q)
+            {
+                if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+                {
+                    return PartialView("_SearchResults", new List<Customer>());
+                }
+
+                var query = q.ToLower();
+                var customers = _repository.GetCustomers()
+                    .Where(c => c.FirstName.ToLower().Contains(query) || 
+                               c.LastName.ToLower().Contains(query) ||
+                               c.Email.ToLower().Contains(query) ||
+                               c.PhoneNumber.ToLower().Contains(query))
+                    .ToList();
+
+                return PartialView("_SearchResults", customers);
+            }
     }
 }

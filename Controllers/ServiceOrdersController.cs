@@ -123,5 +123,51 @@ namespace lab_1.Controllers
             ViewBag.Vehicles = _repository.GetVehicles();
             ViewBag.Mechanics = _repository.GetMechanics();
         }
+
+        [HttpGet]
+        public IActionResult Search(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return Json(new List<object>());
+            }
+
+            var query = q.ToLower();
+            var orders = _repository.GetServiceOrders()
+                .Where(o => o.OrderNumber.ToLower().Contains(query))
+                .Take(10)
+                .Select(o => new { id = o.Id, label = $"{o.OrderNumber} ({o.Status})", value = o.Id })
+                .ToList();
+
+            return Json(orders);
+        }
+
+        [HttpGet("[controller]/api/search")]
+        public IActionResult ApiSearch(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return PartialView("_SearchResults", new List<ServiceOrder>());
+            }
+
+            var query = q.ToLower();
+            var orders = _repository.GetServiceOrders()
+                .Where(o => o.OrderNumber.ToLower().Contains(query) ||
+                           o.Notes.ToLower().Contains(query) ||
+                           (o.Customer != null && (
+                               o.Customer.FirstName.ToLower().Contains(query) ||
+                               o.Customer.LastName.ToLower().Contains(query))) ||
+                           (o.Vehicle != null && (
+                               o.Vehicle.LicensePlate.ToLower().Contains(query) ||
+                               o.Vehicle.Manufacturer.ToLower().Contains(query) ||
+                               o.Vehicle.Model.ToLower().Contains(query))) ||
+                           (o.Mechanic != null && (
+                               o.Mechanic.FirstName.ToLower().Contains(query) ||
+                               o.Mechanic.LastName.ToLower().Contains(query))))
+                .Take(10)
+                .ToList();
+
+            return PartialView("_SearchResults", orders);
+        }
     }
 }

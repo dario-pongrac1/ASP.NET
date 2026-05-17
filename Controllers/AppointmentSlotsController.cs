@@ -122,5 +122,27 @@ namespace lab_1.Controllers
             ViewBag.Mechanics = _repository.GetMechanics();
             ViewBag.ServiceOrders = _repository.GetServiceOrders();
         }
+
+        [HttpGet("[controller]/api/search")]
+        public IActionResult ApiSearch(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return PartialView("_SearchResults", new List<AppointmentSlot>());
+            }
+
+            var query = q.ToLower();
+            var slots = _repository.GetAppointmentSlots()
+                .Where(slot => slot.StartAt.ToString("dd.MM.yyyy HH:mm").ToLower().Contains(query) ||
+                               slot.EndAt.ToString("dd.MM.yyyy HH:mm").ToLower().Contains(query) ||
+                               (slot.Mechanic != null && (
+                                   slot.Mechanic.FirstName.ToLower().Contains(query) ||
+                                   slot.Mechanic.LastName.ToLower().Contains(query))) ||
+                               (slot.ServiceOrder != null && slot.ServiceOrder.OrderNumber.ToLower().Contains(query)))
+                .Take(10)
+                .ToList();
+
+            return PartialView("_SearchResults", slots);
+        }
     }
 }

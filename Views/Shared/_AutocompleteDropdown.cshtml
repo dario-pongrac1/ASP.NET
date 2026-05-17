@@ -1,0 +1,45 @@
+@* 
+  Autocomplete Dropdown Partial
+  Koristi se za AJAX autocomplete unos
+  
+  Parametri (postavljeni u ViewBag od strane kontrolera):
+  - InputId: ID za hidden input (npr. CustomerId)
+  - InputName: Name za hidden input (npr. CustomerId)
+  - DisplayId: ID za display input
+  - DisplayName: Placeholder tekst
+  - SearchEndpoint: URL za /Search endpoint (npr. /Customers/Search)
+  - InitialValue: Početna vrijednost (id)
+  - InitialLabel: Početni label (npr. naziv kupca)
+*@
+
+@{
+    var inputId = ViewBag.InputId ?? "input";
+    var inputName = ViewBag.InputName ?? "input";
+    var displayId = ViewBag.DisplayId ?? (inputId + "-display");
+    var displayName = ViewBag.DisplayName ?? "Odaberi...";
+    var searchEndpoint = ViewBag.SearchEndpoint ?? "/Search";
+    var initialValue = ViewBag.InitialValue ?? "";
+    var initialLabel = ViewBag.InitialLabel ?? "";
+    var dropdownId = ViewBag.DropdownId ?? (inputId + "-dropdown");
+    var resultsId = dropdownId + "-results";
+}
+
+<div class="autocomplete-container">
+    <!-- Hidden input za vrijednost (ID) -->
+    <input type="hidden" id="@inputId" name="@inputName" value="@initialValue" />
+    
+    <!-- Display input za pretragu -->
+    <input type="text" 
+           id="@displayId" 
+           class="form-control autocomplete-input" 
+           placeholder="@displayName"
+           value="@initialLabel"
+           data-endpoint="@searchEndpoint"
+           data-hidden-input="#@inputId"
+           autocomplete="off" />
+    
+    <!-- Container za rezultate -->
+    <div id="@resultsId" class="autocomplete-results" style="display: none;">
+        <ul class="list-group" style="position: absolute; width: 100%; z-index: 1000; max-height: 300px; overflow-y: auto;"></ul>
+    </div>
+</div>

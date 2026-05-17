@@ -112,5 +112,44 @@ namespace lab_1.Controllers
             await _repository.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public IActionResult Search(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return Json(new List<object>());
+            }
+
+            var query = q.ToLower();
+            var mechanics = _repository.GetMechanics()
+                .Where(m => m.FirstName.ToLower().Contains(query) || 
+                           m.LastName.ToLower().Contains(query) ||
+                           m.Specialty.ToLower().Contains(query))
+                .Take(10)
+                .Select(m => new { id = m.Id, label = $"{m.FirstName} {m.LastName} ({m.Specialty})", value = m.Id })
+                .ToList();
+
+            return Json(mechanics);
+        }
+
+        [HttpGet("[controller]/api/search")]
+        public IActionResult ApiSearch(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return PartialView("_SearchResults", new List<Mechanic>());
+            }
+
+            var query = q.ToLower();
+            var mechanics = _repository.GetMechanics()
+                .Where(m => m.FirstName.ToLower().Contains(query) ||
+                           m.LastName.ToLower().Contains(query) ||
+                           m.Specialty.ToLower().Contains(query))
+                .Take(10)
+                .ToList();
+
+            return PartialView("_SearchResults", mechanics);
+        }
     }
 }

@@ -1,0 +1,38 @@
+@model IReadOnlyList<Mechanic>
+
+<div class="table-responsive">
+    <table class="table paper-table">
+        <thead>
+            <tr>
+                <th>Ime</th>
+                <th>Specijalnost</th>
+                <th>Iskustvo</th>
+                <th>Satnica</th>
+                <th>Certifikat</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count == 0)
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Nema rezultata pretrage</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var mechanic in Model)
+                {
+                    <tr>
+                        <td>@mechanic.FirstName @mechanic.LastName</td>
+                        <td>@mechanic.Specialty</td>
+                        <td>@mechanic.ExperienceYears god.</td>
+                        <td>@mechanic.HourlyRate.ToString("0.00") EUR</td>
+                        <td>@(mechanic.IsCertified ? "Da" : "Ne")</td>
+                        <td><a asp-action="Details" asp-route-id="@mechanic.Id">Detalji</a></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,6 +1,8 @@
 using lab_1.Data;
 using lab_1.Services.Repositories;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("hr-HR"),
+    SupportedCultures = new[] { new CultureInfo("hr-HR"), new CultureInfo("en-US") },
+    SupportedUICultures = new[] { new CultureInfo("hr-HR"), new CultureInfo("en-US") }
+});
 app.UseRouting();
 app.UseAuthorization();
 

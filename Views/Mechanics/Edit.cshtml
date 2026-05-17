@@ -34,7 +34,17 @@
         </div>
         <div class="mb-3">
             <label asp-for="EmployedSince"></label>
-            <input asp-for="EmployedSince" class="form-control" type="date" />
+            @{
+                ViewBag.InputId = "EmployedSince";
+                ViewBag.InputName = "EmployedSince";
+                ViewBag.Mode = "date";
+                ViewBag.Placeholder = "dd.MM.yyyy";
+                ViewBag.InitialValue = Model.EmployedSince == default
+                    ? string.Empty
+                    : Model.EmployedSince.ToString("yyyy-MM-dd");
+                ViewBag.NoFuture = true;
+            }
+            @await Html.PartialAsync("_DateTimeControl")
         </div>
     </div>
 

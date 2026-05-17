@@ -5,24 +5,60 @@
     <div class="paper-card">
         <div class="mb-3">
             <label asp-for="StartAt"></label>
-            <input asp-for="StartAt" class="form-control" type="datetime-local" />
+            @{
+                ViewBag.InputId = "StartAt";
+                ViewBag.InputName = "StartAt";
+                ViewBag.Mode = "datetime";
+                ViewBag.Placeholder = "dd.MM.yyyy HH:mm";
+                ViewBag.InitialValue = Model.StartAt == default
+                    ? string.Empty
+                    : Model.StartAt.ToString("yyyy-MM-ddTHH:mm");
+                ViewBag.NoPast = true;
+            }
+            @await Html.PartialAsync("_DateTimeControl")
         </div>
         <div class="mb-3">
             <label asp-for="EndAt"></label>
-            <input asp-for="EndAt" class="form-control" type="datetime-local" />
+            @{
+                ViewBag.InputId = "EndAt";
+                ViewBag.InputName = "EndAt";
+                ViewBag.Mode = "datetime";
+                ViewBag.Placeholder = "dd.MM.yyyy HH:mm";
+                ViewBag.InitialValue = Model.EndAt == default
+                    ? string.Empty
+                    : Model.EndAt.ToString("yyyy-MM-ddTHH:mm");
+                ViewBag.CompareTarget = "#StartAt";
+                ViewBag.CompareMode = "after";
+            }
+            @await Html.PartialAsync("_DateTimeControl")
         </div>
         <div class="mb-3">
             <label>Mehaničar</label>
-            <select asp-for="MechanicId" class="form-control">
-                @foreach (var m in (IEnumerable<Mechanic>)ViewBag.Mechanics) { <option value="@m.Id" selected="@(m.Id==Model.MechanicId)">@m.FirstName @m.LastName</option> }
-            </select>
+            @{
+                var mechanic = Model.MechanicId > 0 ? ((IEnumerable<Mechanic>)ViewBag.Mechanics)?.FirstOrDefault(m => m.Id == Model.MechanicId) : null;
+                ViewBag.InputId = "MechanicId";
+                ViewBag.InputName = "MechanicId";
+                ViewBag.DisplayId = "MechanicDisplay";
+                ViewBag.DisplayName = "Odaberi mehaničara...";
+                ViewBag.SearchEndpoint = "/Mechanics/Search";
+                ViewBag.InitialValue = mechanic?.Id ?? 0;
+                ViewBag.InitialLabel = mechanic != null ? $"{mechanic.FirstName} {mechanic.LastName}" : "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
         <div class="mb-3">
             <label>Radni nalog (opcionalno)</label>
-            <select asp-for="ServiceOrderId" class="form-control">
-                <option value="">-- bez naloga --</option>
-                @foreach (var o in (IEnumerable<ServiceOrder>)ViewBag.ServiceOrders) { <option value="@o.Id" selected="@(o.Id==Model.ServiceOrderId)">@o.OrderNumber</option> }
-            </select>
+            @{
+                var serviceOrder = Model.ServiceOrderId > 0 ? ((IEnumerable<ServiceOrder>)ViewBag.ServiceOrders)?.FirstOrDefault(o => o.Id == Model.ServiceOrderId) : null;
+                ViewBag.InputId = "ServiceOrderId";
+                ViewBag.InputName = "ServiceOrderId";
+                ViewBag.DisplayId = "ServiceOrderDisplay";
+                ViewBag.DisplayName = "Odaberi radni nalog...";
+                ViewBag.SearchEndpoint = "/ServiceOrders/Search";
+                ViewBag.InitialValue = serviceOrder?.Id ?? 0;
+                ViewBag.InitialLabel = serviceOrder != null ? $"{serviceOrder.OrderNumber}" : "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
         <div class="mb-3">
             <label asp-for="IsReserved"></label>

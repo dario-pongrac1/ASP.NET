@@ -122,5 +122,24 @@ namespace lab_1.Controllers
             ViewBag.ServiceOrders = _repository.GetServiceOrders();
             ViewBag.ServiceItems = _repository.GetServiceItems();
         }
+
+        [HttpGet("[controller]/api/search")]
+        public IActionResult ApiSearch(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return PartialView("_SearchResults", new List<OrderLine>());
+            }
+
+            var query = q.ToLower();
+            var lines = _repository.GetOrderLines()
+                .Where(line => line.Id.ToString().Contains(query) ||
+                               (line.ServiceOrder != null && line.ServiceOrder.OrderNumber.ToLower().Contains(query)) ||
+                               (line.ServiceItem != null && line.ServiceItem.Name.ToLower().Contains(query)))
+                .Take(10)
+                .ToList();
+
+            return PartialView("_SearchResults", lines);
+        }
     }
 }

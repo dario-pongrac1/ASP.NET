@@ -4,15 +4,29 @@
     <div class="paper-card">
         <div class="mb-3">
             <label>Radni nalog</label>
-            <select asp-for="ServiceOrderId" class="form-control">
-                @foreach (var o in (IEnumerable<ServiceOrder>)ViewBag.ServiceOrders) { <option value="@o.Id">@o.OrderNumber</option> }
-            </select>
+            @{
+                ViewBag.InputId = "ServiceOrderId";
+                ViewBag.InputName = "ServiceOrderId";
+                ViewBag.DisplayId = "ServiceOrderDisplay";
+                ViewBag.DisplayName = "Odaberi radni nalog...";
+                ViewBag.SearchEndpoint = "/ServiceOrders/Search";
+                ViewBag.InitialValue = "";
+                ViewBag.InitialLabel = "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
         <div class="mb-3">
             <label>Usluga</label>
-            <select asp-for="ServiceItemId" class="form-control">
-                @foreach (var s in (IEnumerable<ServiceItem>)ViewBag.ServiceItems) { <option value="@s.Id">@s.Name</option> }
-            </select>
+            @{
+                ViewBag.InputId = "ServiceItemId";
+                ViewBag.InputName = "ServiceItemId";
+                ViewBag.DisplayId = "ServiceItemDisplay";
+                ViewBag.DisplayName = "Odaberi uslugu...";
+                ViewBag.SearchEndpoint = "/ServiceItems/Search";
+                ViewBag.InitialValue = "";
+                ViewBag.InitialLabel = "";
+            }
+            @await Html.PartialAsync("_AutocompleteDropdown")
         </div>
         <div class="mb-3">
             <label asp-for="Quantity"></label>

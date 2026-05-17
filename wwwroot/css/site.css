@@ -515,3 +515,210 @@ a:hover {
     transition: none;
   }
 }
+
+/* ========== Autocomplete Dropdown Styles ========== */
+.autocomplete-container {
+  position: relative;
+}
+
+.autocomplete-results {
+  position: absolute;
+  width: 100%;
+  top: 100%;
+  z-index: 1000;
+  margin-top: -1px;
+}
+
+.autocomplete-results .list-group {
+  border-radius: 0 0 0.25rem 0.25rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.autocomplete-results .list-group-item {
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+}
+
+.autocomplete-results .list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+.autocomplete-results .list-group-item.active {
+  background-color: #e7f3ff;
+  color: #0066cc;
+}
+
+.autocomplete-loading {
+  opacity: 0.6;
+  position: relative;
+}
+
+.autocomplete-loading::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #0066cc;
+  border-radius: 50%;
+  animation: autocomplete-spin 1s linear infinite;
+}
+
+@keyframes autocomplete-spin {
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* ========== Search Container Styles ========== */
+.search-container {
+  position: relative;
+}
+
+.search-container .input-group {
+  border: 1px solid var(--line-tech);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.search-container .form-control {
+  border: none;
+  background-color: var(--bg-panel);
+  color: var(--text-body);
+}
+
+.search-container .form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.search-container .input-group-text {
+  background-color: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding-right: 1rem;
+}
+
+#searchResults {
+  margin-top: 1rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.motion-ready .reveal-panel,
+.motion-ready .row-reveal {
+  transition:
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-panel {
+  opacity: 0;
+  transform: translateY(14px) scale(0.99);
+  filter: blur(3px);
+}
+
+.reveal-panel.is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.row-reveal {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.row-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: var(--row-delay, 0ms);
+}
+
+.paper-card,
+.table-responsive,
+.form-container,
+.search-container {
+  backface-visibility: hidden;
+}
+
+.datetime-control {
+  margin-bottom: 1rem;
+}
+
+.datetime-control-label {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  color: var(--text-body);
+  font-weight: 600;
+}
+
+.datetime-display {
+  background-color: var(--bg-panel);
+  border-color: var(--line-tech);
+  color: var(--text-body);
+}
+
+.datetime-display::placeholder {
+  color: var(--text-muted);
+}
+
+.datetime-display:focus {
+  background-color: var(--bg-panel);
+  color: var(--text-body);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.15rem rgba(242, 140, 40, 0.18);
+}
+
+.search-highlight {
+  padding: 0 0.15rem;
+  border-radius: 0.2rem;
+  background-color: rgba(242, 140, 40, 0.35);
+  color: var(--text-strong);
+}
+
+.page-header,
+.paper-card,
+.table-responsive,
+.form-container,
+.search-container {
+  will-change: opacity, transform;
+}
+
+.btn-pending {
+  opacity: 0.9;
+  pointer-events: none;
+  position: relative;
+}
+
+.btn-pending::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  transform: translateX(-100%);
+  animation: pending-sweep 0.9s ease infinite;
+}
+
+.action-flash {
+  transform: translateY(-1px) scale(0.985);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes pending-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

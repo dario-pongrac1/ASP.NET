@@ -14,6 +14,7 @@
         <h1>Kategorije usluga</h1>
         <p class="mb-0">Klasifikacija usluga radionice.</p>
     </div>
+    <a asp-action="Create" class="btn btn-dark">+ Nova kategorija</a>
 </section>
 
 <div class="search-container mb-3">
@@ -45,7 +46,11 @@
                     <td>@category.Name</td>
                     <td>@category.Description</td>
                     <td>@category.Services.Count</td>
-                    <td><a asp-action="Details" asp-route-id="@category.Id">Detalji</a></td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@category.Id" class="btn-link">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@category.Id" class="btn-link">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@category.Id" class="btn-link text-danger">Obriši</a>
+                    </td>
                 </tr>
             }
         </tbody>

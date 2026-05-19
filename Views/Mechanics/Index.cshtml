@@ -14,6 +14,7 @@
         <h1>Mehaničari</h1>
         <p class="mb-0">Strucni kadar i raspored rada.</p>
     </div>
+    <a asp-action="Create" class="btn btn-dark">+ Novi mehaničar</a>
 </section>
 
 <div class="search-container mb-3">
@@ -49,7 +50,11 @@
                     <td>@mechanic.ExperienceYears god.</td>
                     <td>@mechanic.HourlyRate.ToString("0.00") EUR</td>
                     <td>@(mechanic.IsCertified ? "Da" : "Ne")</td>
-                    <td><a asp-action="Details" asp-route-id="@mechanic.Id">Detalji</a></td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@mechanic.Id" class="btn-link">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@mechanic.Id" class="btn-link">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@mechanic.Id" class="btn-link text-danger">Obriši</a>
+                    </td>
                 </tr>
             }
         </tbody>

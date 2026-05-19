@@ -14,6 +14,7 @@
         <h1>Vozila</h1>
         <p class="mb-0">Pregled vozila koja se servisiraju u radionici.</p>
     </div>
+    <a asp-action="Create" class="btn btn-dark">+ Novo vozilo</a>
 </section>
 
 <div class="search-container mb-3">
@@ -53,7 +54,11 @@
                             @vehicle.Owner?.FirstName @vehicle.Owner?.LastName
                         </a>
                     </td>
-                    <td><a asp-action="Details" asp-route-id="@vehicle.Id">Detalji</a></td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@vehicle.Id" class="btn-link">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@vehicle.Id" class="btn-link">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@vehicle.Id" class="btn-link text-danger">Obriši</a>
+                    </td>
                 </tr>
             }
         </tbody>

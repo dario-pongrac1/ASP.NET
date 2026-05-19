@@ -14,6 +14,7 @@
         <h1>Termini mehanicara</h1>
         <p class="mb-0">Pregled zauzetih i slobodnih termina.</p>
     </div>
+    <a asp-action="Create" class="btn btn-dark">+ Novi termin</a>
 </section>
 
 <div class="search-container mb-3">
@@ -58,7 +59,11 @@
                             <span>-</span>
                         }
                     </td>
-                    <td><a asp-action="Details" asp-route-id="@slot.Id">Detalji</a></td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@slot.Id" class="btn-link">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@slot.Id" class="btn-link">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@slot.Id" class="btn-link text-danger">Obriši</a>
+                    </td>
                 </tr>
             }
         </tbody>

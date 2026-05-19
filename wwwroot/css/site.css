@@ -722,3 +722,29 @@ a:hover {
     opacity: 1;
   }
 }
+
+/* Ensure cancel buttons are always visible and prominent */
+.btn-cancel {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  color: var(--text-body) !important;
+  border-color: var(--line-tech) !important;
+  background-color: transparent !important;
+  z-index: 3;
+}
+.btn-cancel:hover {
+  color: var(--text-strong) !important;
+  border-color: var(--accent) !important;
+}
+
+/* Make action row stick to bottom of card on taller pages so cancel/save remain visible */
+.paper-card > .form-actions,
+.form-container > .mt-3,
+form > .mt-3 {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(29,33,37,0), rgba(29,33,37,0.95));
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}

@@ -14,6 +14,7 @@
         <h1>Radni nalozi</h1>
         <p class="mb-0">Otvoreni i zavrseni nalozi radionice.</p>
     </div>
+    <a asp-action="Create" class="btn btn-dark">+ Novi nalog</a>
 </section>
 
 <div class="search-container mb-3">
@@ -51,7 +52,11 @@
                     <td><a asp-controller="Vehicles" asp-action="Details" asp-route-id="@order.VehicleId">@order.Vehicle?.LicensePlate</a></td>
                     <td><a asp-controller="Mechanics" asp-action="Details" asp-route-id="@order.MechanicId">@order.Mechanic?.FirstName @order.Mechanic?.LastName</a></td>
                     <td class="status-@order.Status.ToString().ToLowerInvariant()">@order.Status</td>
-                    <td><a asp-action="Details" asp-route-id="@order.Id">Detalji</a></td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@order.Id" class="btn-link">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@order.Id" class="btn-link">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@order.Id" class="btn-link text-danger">Obriši</a>
+                    </td>
                 </tr>
             }
         </tbody>

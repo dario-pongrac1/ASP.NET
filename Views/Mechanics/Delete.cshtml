@@ -14,6 +14,6 @@
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
         <button type="submit" class="btn btn-danger">Obriši</button>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark">Odustani</a>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark btn-cancel">Odustani</a>
     </form>
 </div>

@@ -3,26 +3,34 @@
 @{
     var inputId = ViewBag.InputId?.ToString() ?? "DateValue";
     var inputName = ViewBag.InputName?.ToString() ?? inputId;
-    var displayId = ViewBag.DisplayId?.ToString() ?? $"{inputId}Display";
     var mode = ViewBag.Mode?.ToString() ?? "datetime";
+    var inputType = mode == "date" ? "date" : "datetime-local";
     var placeholder = ViewBag.Placeholder?.ToString() ?? (mode == "date" ? "dd.MM.yyyy" : "dd.MM.yyyy HH:mm");
     var initialValue = ViewBag.InitialValue?.ToString() ?? string.Empty;
     var label = ViewBag.Label?.ToString();
     var modelStateValue = ViewData.ModelState.TryGetValue(inputName, out Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateEntry? entry) && entry != null
         ? entry.AttemptedValue
         : null;
-    var displayValue = modelStateValue ?? string.Empty;
+    var rawValue = modelStateValue ?? initialValue;
     var validationMessage = ViewData.ModelState.TryGetValue(inputName, out Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateEntry? state) && state != null && state.Errors.Count > 0
         ? state.Errors[0].ErrorMessage
         : string.Empty;
 
+    string controlValue = string.Empty;
     DateTime parsedDate = default;
-    if (string.IsNullOrWhiteSpace(displayValue) && !string.IsNullOrWhiteSpace(initialValue) &&
-        DateTime.TryParse(initialValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out parsedDate))
+    if (!string.IsNullOrWhiteSpace(rawValue) &&
+        DateTime.TryParse(rawValue, CultureInfo.CurrentCulture, DateTimeStyles.None, out parsedDate))
     {
-        displayValue = mode == "date"
-            ? parsedDate.ToString("d", CultureInfo.CurrentCulture)
-            : parsedDate.ToString("g", CultureInfo.CurrentCulture);
+        controlValue = mode == "date"
+            ? parsedDate.ToString("yyyy-MM-dd")
+            : parsedDate.ToString("yyyy-MM-ddTHH:mm");
+    }
+    else if (!string.IsNullOrWhiteSpace(rawValue) &&
+        DateTime.TryParse(rawValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out parsedDate))
+    {
+        controlValue = mode == "date"
+            ? parsedDate.ToString("yyyy-MM-dd")
+            : parsedDate.ToString("yyyy-MM-ddTHH:mm");
     }
 }
 
@@ -31,21 +39,13 @@
     {
         <div class="datetime-control-label">@label</div>
     }
-    <input type="hidden"
+        <input type="@inputType"
            id="@inputId"
            name="@inputName"
-           value="@initialValue"
-           data-role="value" />
-    <input type="text"
-           id="@displayId"
-           class="form-control datetime-display"
-           value="@displayValue"
+            class="form-control datetime-native"
+            value="@controlValue"
            placeholder="@placeholder"
-           autocomplete="off"
-           inputmode="numeric"
-           data-role="display"
-           data-hidden-input="#@inputId"
-           data-locale="@CultureInfo.CurrentCulture.Name"
+            data-role="value"
            data-no-past="@(ViewBag.NoPast?.ToString()?.ToLowerInvariant() ?? "false")"
            data-no-future="@(ViewBag.NoFuture?.ToString()?.ToLowerInvariant() ?? "false")"
            data-compare-target="@(ViewBag.CompareTarget?.ToString() ?? string.Empty)"
